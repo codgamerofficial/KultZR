@@ -1,5 +1,6 @@
 import { Product } from './types';
 
+// REAL QIKINK OPEN API CATALOG PRODUCTS ONLY (NO DEMO / FAKE PRODUCTS)
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: 'qikink-64609138',
@@ -81,59 +82,6 @@ export const MOCK_PRODUCTS: Product[] = [
     is_featured: true,
     rating: 4.92,
     review_count: 39
-  },
-  {
-    id: 'prod-001',
-    title: 'The Identity Oversized Tee',
-    slug: 'the-identity-oversized-tee',
-    category_slug: 'unisex',
-    gender: 'unisex',
-    price: 1899,
-    original_price: 2499,
-    description: 'A heavyweight luxury canvas designed for personal storytelling. Made with zero-waste on-demand printing.',
-    story: 'Every seam carries intent. "The Identity" represents your personal manifesto—bold, uncompromised, and authentically yours.',
-    fabric_details: '100% Combed Organic Cotton • 240 GSM Heavyweight • Bio-Washed • Anti-Pilling',
-    images: [
-      'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000',
-    ],
-    colors: [
-      { name: 'Obsidian Black', hex: '#0A0A0C' },
-      { name: 'Pearl White', hex: '#FAFAFA' },
-      { name: 'Vintage Washed Charcoal', hex: '#272730' },
-      { name: 'Imperial Gold', hex: '#D4AF37' }
-    ],
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    is_customizable: true,
-    is_featured: true,
-    rating: 4.9,
-    review_count: 34
-  },
-  {
-    id: 'prod-002',
-    title: 'Storyteller Heavyweight Hoodie',
-    slug: 'storyteller-heavyweight-hoodie',
-    category_slug: 'unisex',
-    gender: 'unisex',
-    price: 3499,
-    original_price: 4299,
-    description: 'Structured silhouette tailored with fleece interior. Perfect canvas for custom back quotes and artwork.',
-    story: 'Built for winter nights, creative breakthroughs, and unspoken ambition.',
-    fabric_details: '80% Organic Cotton, 20% Recycled Poly • 380 GSM Fleece • Double-Lined Hood • YKK Hardware',
-    images: [
-      'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&q=80&w=1000',
-    ],
-    colors: [
-      { name: 'Midnight Charcoal', hex: '#141418' },
-      { name: 'Sand Cream', hex: '#E6E2DD' },
-      { name: 'Obsidian Black', hex: '#0A0A0C' }
-    ],
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    is_customizable: true,
-    is_featured: true,
-    rating: 4.95,
-    review_count: 52
   }
 ];
 
