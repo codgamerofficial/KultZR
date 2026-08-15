@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/lib/types';
 import { useCart } from '@/lib/cartContext';
-import { Sparkles, ShoppingBag, Star, Check } from 'lucide-react';
+import { ShoppingBag, Star, Check } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -13,13 +13,36 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+  
+  // Safe color parsing
+  const colorsArray = Array.isArray(product.colors) 
+    ? product.colors 
+    : typeof product.colors === 'string'
+    ? JSON.parse(product.colors)
+    : [{ name: 'Obsidian Black', hex: '#0A0A0C' }];
+    
+  const [selectedColor, setSelectedColor] = useState(colorsArray[0] || { name: 'Default', hex: '#0A0A0C' });
   const [added, setAdded] = useState(false);
+
+  // Safe sizes parsing
+  const sizesArray: string[] = Array.isArray(product.sizes) 
+    ? product.sizes 
+    : typeof product.sizes === 'string'
+    ? (product.sizes as string).split(',').map(s => s.trim())
+    : ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+  // Safe images parsing
+  const rawImageUrl = (product as any).image_url || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000';
+  const imagesArray: string[] = Array.isArray(product.images) 
+    ? product.images 
+    : typeof product.images === 'string'
+    ? JSON.parse(product.images)
+    : [rawImageUrl];
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product, product.sizes[0] || 'M', selectedColor);
+    addToCart(product, sizesArray[0] || 'M', selectedColor);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -30,7 +53,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Product Image Container with object-contain for crisp garment display */}
         <div className="w-full aspect-square relative bg-brand-dark/95 p-4 overflow-hidden flex items-center justify-center">
           <Image
-            src={product.images[0]}
+            src={imagesArray[0] || rawImageUrl}
             alt={product.title}
             fill
             className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
@@ -44,15 +67,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                 Featured Drop
               </span>
             )}
-            {product.is_customizable && (
-              <span className="px-2.5 py-1 rounded-full bg-brand-dark/90 backdrop-blur-md text-brand-gold border border-brand-gold/40 text-[10px] font-bold flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-brand-gold" /> 2D Studio Bespoke
-              </span>
-            )}
           </div>
 
           <span className="absolute bottom-3 left-3 px-2 py-0.5 rounded-md bg-brand-dark/80 text-[10px] text-brand-muted border border-brand-border font-mono">
-            {product.sizes.join(' • ')}
+            {sizesArray.join(' • ')}
           </span>
 
           {/* Quick Add Button */}
@@ -73,7 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
             <div className="flex items-center gap-1 text-[11px] font-bold text-amber-400">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
-              <span>{product.rating}</span>
+              <span>{product.rating || 4.9}</span>
             </div>
           </div>
 
@@ -87,19 +105,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Colors */}
           <div className="flex items-center gap-1.5 pt-2">
-            {product.colors.map(color => (
+            {colorsArray.map((color: any, idx: number) => (
               <button
-                key={color.name}
+                key={color.name || idx}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   setSelectedColor(color);
                 }}
-                style={{ backgroundColor: color.hex }}
+                style={{ backgroundColor: color.hex || '#0A0A0C' }}
                 className={`w-4 h-4 rounded-full border transition-transform ${
                   selectedColor.name === color.name ? 'border-brand-gold scale-125 shadow-md shadow-amber-500/20' : 'border-brand-border'
                 }`}
-                title={color.name}
+                title={color.name || 'Color'}
               />
             ))}
           </div>
@@ -109,9 +127,9 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Footer Price */}
       <div className="px-5 pb-5 pt-2 border-t border-brand-border/40 flex items-center justify-between">
         <div>
-          <span className="text-lg font-black text-brand-pearl">₹{product.price.toLocaleString('en-IN')}</span>
+          <span className="text-lg font-black text-brand-pearl">₹{Number(product.price).toLocaleString('en-IN')}</span>
           {product.original_price && (
-            <span className="text-xs text-brand-muted line-through ml-2">₹{product.original_price.toLocaleString('en-IN')}</span>
+            <span className="text-xs text-brand-muted line-through ml-2">₹{Number(product.original_price).toLocaleString('en-IN')}</span>
           )}
         </div>
         <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
