@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/lib/cartContext';
 import { MOCK_PRODUCTS } from '@/lib/mockData';
 import { Product, ColorOption } from '@/lib/types';
-import { Sparkles, ShoppingBag, Type, Palette, Layout, ShieldCheck, Check } from 'lucide-react';
+import { Sparkles, ShoppingBag, Type, Palette, Layout, ShieldCheck, Check, Upload, Image as ImageIcon, Share2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const FONTS = [
@@ -31,6 +31,14 @@ const STORY_PRESETS = [
   "Crafted in Silence, Speaks in Thunder.",
 ];
 
+const EMBLEM_PRESETS = [
+  { name: 'None', icon: null },
+  { name: 'Quill & Thread', icon: '🖋️' },
+  { name: 'Phoenix Crest', icon: '🦅' },
+  { name: 'Minimalist Sun', icon: '☀️' },
+  { name: 'Heritage Knot', icon: '⚜️' },
+];
+
 export default function CustomizerStudio({ initialProduct }: { initialProduct?: Product }) {
   const { addToCart } = useCart();
 
@@ -42,8 +50,28 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
   const [customText, setCustomText] = useState<string>('WEAR YOUR STORY');
   const [selectedFont, setSelectedFont] = useState<string>(FONTS[0].name);
   const [selectedTextColor, setSelectedTextColor] = useState<string>('#FAFAFA');
+  const [selectedEmblem, setSelectedEmblem] = useState<string>('None');
+  const [uploadedGraphic, setUploadedGraphic] = useState<string | null>(null);
   const [placement, setPlacement] = useState<'front_center' | 'back_center' | 'chest_pocket'>('front_center');
   const [added, setAdded] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedGraphic(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleShareDesign = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleAddToCart = () => {
     addToCart(
@@ -56,6 +84,7 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
         text_color: selectedTextColor,
         garment_color: selectedGarmentColor.name,
         placement: placement,
+        graphic_url: uploadedGraphic || undefined,
       }
     );
 
@@ -68,6 +97,8 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
 
     setTimeout(() => setAdded(false), 2500);
   };
+
+  const emblemObj = EMBLEM_PRESETS.find(e => e.name === selectedEmblem);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -97,6 +128,15 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
               'top-[32%] left-[38%] -translate-x-1/2'
             }`}
           >
+            {/* Custom Graphic or Emblem */}
+            {uploadedGraphic ? (
+              <div className="w-16 h-16 relative mx-auto mb-2 opacity-90">
+                <img src={uploadedGraphic} alt="Custom Graphic" className="w-full h-full object-contain" />
+              </div>
+            ) : emblemObj?.icon ? (
+              <div className="text-3xl mb-1 drop-shadow-md">{emblemObj.icon}</div>
+            ) : null}
+
             <p
               className="tracking-widest font-extrabold uppercase drop-shadow-md select-none transition-all"
               style={{
@@ -114,14 +154,17 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
             </span>
           </div>
 
-          {/* Watermark / Badge Indicator */}
+          {/* Canvas Watermark Bar */}
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-brand-pearl bg-brand-dark/80 backdrop-blur-md px-4 py-2 rounded-xl border border-brand-border">
             <span className="flex items-center gap-1.5 text-brand-gold font-bold">
               <Sparkles className="w-4 h-4" /> Live 2D Mockup Canvas
             </span>
-            <span className="text-brand-muted text-[11px]">
-              Made-to-Order • Zero Stock Waste
-            </span>
+            <button 
+              onClick={handleShareDesign}
+              className="text-brand-muted hover:text-brand-gold text-[11px] font-semibold flex items-center gap-1 transition-colors"
+            >
+              <Share2 className="w-3.5 h-3.5" /> {copied ? 'Link Copied!' : 'Share Design'}
+            </button>
           </div>
 
         </div>
@@ -195,7 +238,40 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
           </div>
         </div>
 
-        {/* Control 2: Font Family */}
+        {/* Control 2: Story Emblems & Upload */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-xs">
+            <label className="font-bold uppercase tracking-wider text-brand-pearl flex items-center gap-1.5">
+              <ImageIcon className="w-3.5 h-3.5 text-brand-gold" /> Story Emblem / Graphic
+            </label>
+            <label className="text-brand-gold hover:underline cursor-pointer flex items-center gap-1 font-semibold">
+              <Upload className="w-3.5 h-3.5" /> Upload Custom Graphic
+              <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+            </label>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            {EMBLEM_PRESETS.map(emblem => (
+              <button
+                key={emblem.name}
+                onClick={() => {
+                  setSelectedEmblem(emblem.name);
+                  setUploadedGraphic(null);
+                }}
+                className={`py-2 px-2 rounded-xl border text-[11px] text-center flex items-center justify-center gap-1 transition-all ${
+                  selectedEmblem === emblem.name && !uploadedGraphic
+                    ? 'border-brand-gold bg-brand-gold/10 text-brand-gold font-bold'
+                    : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
+                }`}
+              >
+                {emblem.icon && <span>{emblem.icon}</span>}
+                <span className="truncate">{emblem.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Control 3: Typography Style */}
         <div className="space-y-2">
           <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl">
             Typography Style
@@ -217,7 +293,7 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
           </div>
         </div>
 
-        {/* Control 3: Text & Garment Colors */}
+        {/* Control 4: Text & Garment Colors */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl flex items-center gap-1.5">
@@ -254,7 +330,7 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
           </div>
         </div>
 
-        {/* Control 4: Placement & Size */}
+        {/* Control 5: Placement & Size */}
         <div className="grid grid-cols-2 gap-4 pt-2">
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl flex items-center gap-1.5">
@@ -310,7 +386,7 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
 
           <button
             onClick={handleAddToCart}
-            className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all"
+            className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
           >
             {added ? (
               <>
