@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Sparkles, ShieldCheck, Truck, RefreshCw, Mail, ArrowRight, Heart } from 'lucide-react';
+import { Sparkles, ShieldCheck, Truck, RefreshCw, ArrowRight } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -89,6 +89,9 @@ export default function Footer() {
           <div className="md:col-span-3 space-y-3">
             <h4 className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Customer Care</h4>
             <ul className="space-y-2 text-xs text-brand-muted">
+              <li>
+                <Link href="/track" className="hover:text-brand-pearl transition-colors font-semibold text-brand-pearl">Track Order Status</Link>
+              </li>
               <li>
                 <Link href="/shipping" className="hover:text-brand-pearl transition-colors">Shipping & Delivery Times</Link>
               </li>
