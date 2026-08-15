@@ -14,8 +14,8 @@ export const MOCK_PRODUCTS: Product[] = [
     story: 'Clean retro sportswear silhouette meets modern luxury streetwear storytelling.',
     fabric_details: '100% Combed Organic Cotton • 240 GSM Contrast Ringer • Pre-Shrunk • Qikink Product ID 64609138',
     images: [
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000',
       'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000',
     ],
     colors: [
       { name: 'Red / White Accent', hex: '#E54D42' },
@@ -41,8 +41,8 @@ export const MOCK_PRODUCTS: Product[] = [
     story: 'Sovereignty on the street. Designed for high-density chest emblems and back statements.',
     fabric_details: 'Heavyweight Fleece Satin Lined • Premium Ribbed Cuffs • Snap Buttons • Qikink Product ID 63665902',
     images: [
-      'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1000',
       'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1000',
     ],
     colors: [
       { name: 'Lavender Purple / White', hex: '#8B5CF6' },
@@ -68,8 +68,8 @@ export const MOCK_PRODUCTS: Product[] = [
     story: 'Crafted in silence, speaks in thunder. Tailored for bespoke personalization.',
     fabric_details: 'Heavyweight Fleece Satin Lined • Custom Ribbing • Qikink Product ID 63665896',
     images: [
-      'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=1000',
       'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=1000',
     ],
     colors: [
       { name: 'Royal Blue / White', hex: '#2563EB' },
