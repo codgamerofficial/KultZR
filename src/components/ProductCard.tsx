@@ -11,17 +11,29 @@ interface ProductCardProps {
   product: Product;
 }
 
+function safeJsonParse<T>(val: any, fallback: T): T {
+  if (!val) return fallback;
+  if (Array.isArray(val)) return val as unknown as T;
+  if (typeof val === 'string') {
+    const trimmed = (val as string).trim();
+    if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+      try {
+        return JSON.parse(trimmed) as T;
+      } catch {
+        return fallback;
+      }
+    }
+  }
+  return fallback;
+}
+
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   
   // Safe color parsing
-  const colorsArray = Array.isArray(product.colors) 
-    ? product.colors 
-    : typeof product.colors === 'string'
-    ? JSON.parse(product.colors)
-    : [{ name: 'Obsidian Black', hex: '#0A0A0C' }];
-    
-  const [selectedColor, setSelectedColor] = useState(colorsArray[0] || { name: 'Default', hex: '#0A0A0C' });
+  const defaultColors = [{ name: 'Obsidian Black', hex: '#0A0A0C' }];
+  const colorsArray = safeJsonParse<any[]>(product.colors, defaultColors);
+  const [selectedColor, setSelectedColor] = useState(colorsArray[0] || defaultColors[0]);
   const [added, setAdded] = useState(false);
 
   // Safe sizes parsing
@@ -33,11 +45,10 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   // Safe images parsing
   const rawImageUrl = (product as any).image_url || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000';
-  const imagesArray: string[] = Array.isArray(product.images) 
-    ? product.images 
-    : typeof product.images === 'string'
-    ? JSON.parse(product.images)
-    : [rawImageUrl];
+  const defaultImages = [rawImageUrl];
+  const imagesArray = safeJsonParse<string[]>(product.images, defaultImages);
+  const isPlainStringImage = typeof product.images === 'string' && !(product.images as string).trim().startsWith('[');
+  const displayImage = isPlainStringImage ? (product.images as unknown as string) : (imagesArray[0] || rawImageUrl);
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -53,7 +64,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Product Image Container with object-contain for crisp garment display */}
         <div className="w-full aspect-square relative bg-brand-dark/95 p-4 overflow-hidden flex items-center justify-center">
           <Image
-            src={imagesArray[0] || rawImageUrl}
+            src={displayImage || rawImageUrl}
             alt={product.title}
             fill
             className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
@@ -115,7 +126,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 }}
                 style={{ backgroundColor: color.hex || '#0A0A0C' }}
                 className={`w-4 h-4 rounded-full border transition-transform ${
-                  selectedColor.name === color.name ? 'border-brand-gold scale-125 shadow-md shadow-amber-500/20' : 'border-brand-border'
+                  selectedColor?.name === color.name ? 'border-brand-gold scale-125 shadow-md shadow-amber-500/20' : 'border-brand-border'
                 }`}
                 title={color.name || 'Color'}
               />
