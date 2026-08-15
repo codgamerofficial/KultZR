@@ -68,16 +68,13 @@ export default function Footer() {
 
           {/* Quick Links (3 cols) */}
           <div className="md:col-span-3 space-y-3">
-            <h4 className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Brand & Studio</h4>
+            <h4 className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Brand & Catalog</h4>
             <ul className="space-y-2 text-xs text-brand-muted">
               <li>
                 <Link href="/about" className="hover:text-brand-pearl transition-colors">About KultZR</Link>
               </li>
               <li>
                 <Link href="/story" className="hover:text-brand-pearl transition-colors">Brand Manifesto</Link>
-              </li>
-              <li>
-                <Link href="/customize" className="hover:text-brand-pearl transition-colors">2D Bespoke Studio</Link>
               </li>
               <li>
                 <Link href="/shop" className="hover:text-brand-pearl transition-colors">Explore Collections</Link>

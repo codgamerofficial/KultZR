@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useCart } from '@/lib/cartContext';
 import { useAuth } from '@/lib/authContext';
 import AuthModal from './AuthModal';
-import { ShoppingBag, Search, User, Menu, X, Sparkles, LogOut } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, X, LogOut } from 'lucide-react';
 
 export default function Navbar() {
   const { cartCount, setIsCartOpen } = useCart();
@@ -36,9 +36,6 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-8 text-xs uppercase tracking-widest font-bold text-brand-muted">
             <Link href="/" className="hover:text-brand-gold transition-colors">Home</Link>
             <Link href="/shop" className="hover:text-brand-gold transition-colors">Shop Catalog</Link>
-            <Link href="/customize" className="hover:text-brand-gold transition-colors flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-brand-gold" /> Bespoke Studio
-            </Link>
             <Link href="/story" className="hover:text-brand-gold transition-colors">Our Story</Link>
             <Link href="/about" className="hover:text-brand-gold transition-colors">About</Link>
           </nav>
@@ -49,7 +46,7 @@ export default function Navbar() {
             {/* Search Trigger */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 text-brand-muted hover:text-brand-gold transition-colors"
+              className="p-2 text-brand-muted hover:text-brand-gold transition-colors cursor-pointer"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
@@ -60,14 +57,14 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/account"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/20 transition-colors text-xs font-bold"
+                  className="px-3 py-1.5 rounded-full bg-brand-card border border-brand-border hover:border-brand-gold text-xs font-bold text-brand-pearl flex items-center gap-1.5 transition-all"
                 >
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:inline line-clamp-1">{profile?.full_name || user.email?.split('@')[0]}</span>
+                  <User className="w-3.5 h-3.5 text-brand-gold" />
+                  <span className="max-w-[100px] truncate">{profile?.full_name || 'My Account'}</span>
                 </Link>
                 <button
                   onClick={() => signOut()}
-                  className="p-2 text-brand-muted hover:text-red-400 transition-colors"
+                  className="p-2 text-brand-muted hover:text-red-400 transition-colors cursor-pointer"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -76,22 +73,21 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => setAuthModalOpen(true)}
-                className="p-2 text-brand-muted hover:text-brand-gold transition-colors flex items-center gap-1 text-xs font-bold"
+                className="flex items-center gap-1.5 text-xs uppercase font-bold text-brand-pearl hover:text-brand-gold transition-colors cursor-pointer"
               >
-                <User className="w-5 h-5" />
-                <span className="hidden sm:inline">Sign In</span>
+                <User className="w-4 h-4 text-brand-gold" /> Sign In
               </button>
             )}
 
-            {/* Cart Counter Button */}
+            {/* Cart Bag Icon Trigger */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 text-brand-pearl hover:text-brand-gold transition-colors flex items-center justify-center cursor-pointer"
-              aria-label="Shopping Cart"
+              className="relative p-2.5 bg-brand-gold text-brand-dark rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              aria-label="View Bag"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-5 h-5 stroke-[2.5]" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-gold text-brand-dark font-extrabold text-[10px] flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white font-extrabold text-[10px] rounded-full flex items-center justify-center border-2 border-brand-dark animate-bounce">
                   {cartCount}
                 </span>
               )}
@@ -100,7 +96,7 @@ export default function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-brand-muted hover:text-brand-pearl"
+              className="md:hidden p-2 text-brand-muted hover:text-brand-gold transition-colors cursor-pointer"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -108,46 +104,48 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Expandable Search Overlay */}
+        {/* Expandable Search Input */}
         {searchOpen && (
-          <div className="border-t border-brand-border bg-brand-secondary p-4 animate-in slide-in-from-top duration-200">
-            <div className="max-w-3xl mx-auto flex items-center gap-3">
-              <Search className="w-5 h-5 text-brand-gold" />
+          <div className="bg-brand-dark/95 border-b border-brand-border px-4 py-3 animate-in slide-in-from-top-2 duration-300">
+            <div className="max-w-3xl mx-auto flex items-center gap-2">
+              <Search className="w-4 h-4 text-brand-gold shrink-0" />
               <input
                 type="text"
-                placeholder="Search heavyweight tees, hoodies, statement graphics..."
+                placeholder="Search products by title, category, or fabric..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-sm text-brand-pearl focus:outline-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchQuery) {
+                    window.location.href = `/shop?search=${encodeURIComponent(searchQuery)}`;
+                  }
+                }}
+                className="w-full bg-transparent text-sm text-brand-pearl focus:outline-none placeholder:text-brand-muted"
                 autoFocus
               />
-              {searchQuery && (
-                <Link
-                  href={`/shop?search=${encodeURIComponent(searchQuery)}`}
-                  onClick={() => setSearchOpen(false)}
-                  className="px-4 py-1.5 bg-brand-gold text-brand-dark font-bold text-xs rounded-full"
-                >
-                  Search
-                </Link>
-              )}
+              <button
+                onClick={() => setSearchOpen(false)}
+                className="text-xs font-bold text-brand-muted hover:text-brand-gold uppercase tracking-wider"
+              >
+                Cancel
+              </button>
             </div>
-          </div>
-        )}
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-brand-border bg-brand-dark/95 backdrop-blur-xl px-4 py-6 space-y-4 text-sm font-bold uppercase tracking-widest text-brand-muted">
-            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-brand-gold">Home</Link>
-            <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-brand-gold">Shop Catalog</Link>
-            <Link href="/customize" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-brand-gold">Bespoke Studio</Link>
-            <Link href="/story" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-brand-gold">Our Story</Link>
-            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-brand-gold">About</Link>
-            <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="block py-2 hover:text-brand-gold">My Account</Link>
           </div>
         )}
       </header>
 
-      {/* Auth Modal Trigger */}
+      {/* Mobile Drawer Navigation */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-30 bg-brand-dark/95 backdrop-blur-xl pt-24 px-6 space-y-6 animate-in fade-in duration-300">
+          <nav className="flex flex-col gap-6 text-base font-extrabold uppercase tracking-widest text-brand-pearl">
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold">Home</Link>
+            <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold">Shop Catalog</Link>
+            <Link href="/story" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold">Our Story</Link>
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold">About</Link>
+          </nav>
+        </div>
+      )}
+
+      {/* Auth Modal */}
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </>
   );

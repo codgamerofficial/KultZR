@@ -1,15 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
-import CustomizerStudio from '@/components/CustomizerStudio';
-import { MOCK_PRODUCTS, MOCK_TESTIMONIALS } from '@/lib/mockData';
+import { fetchProducts } from '@/lib/supabase';
+import { Product } from '@/lib/types';
+import { MOCK_TESTIMONIALS } from '@/lib/mockData';
 import { Sparkles, ArrowRight, ShieldCheck, Leaf, Flame, Heart, Star, Send } from 'lucide-react';
 
 export default function HomePage() {
-  const featuredProducts = MOCK_PRODUCTS.filter(p => p.is_featured);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadRealProducts() {
+      setLoading(true);
+      const data = await fetchProducts();
+      setProducts(data);
+      setLoading(false);
+    }
+    loadRealProducts();
+  }, []);
 
   return (
     <div className="space-y-20 pb-16">
@@ -31,29 +43,29 @@ export default function HomePage() {
 
           <div className="space-y-4 max-w-3xl mx-auto">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/30 text-xs font-bold uppercase tracking-widest">
-              <Sparkles className="w-4 h-4" /> Zero-Inventory Luxury Apparel
+              <Sparkles className="w-4 h-4" /> Live Qikink Open API Integration
             </span>
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-brand-pearl leading-none">
               WEAR YOUR <span className="bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 bg-clip-text text-transparent">STORY.</span>
             </h1>
             <p className="text-brand-muted text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-              Unapologetic, 240 GSM organic cotton heavyweight streetwear printed exclusively on-demand. Personalize your identity with our 2D Bespoke Studio.
+              Unapologetic, 240 GSM organic cotton heavyweight streetwear printed exclusively on-demand. Synced directly with Qikink Open API fulfillment.
             </p>
           </div>
 
           {/* Action CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
-              href="/customize"
+              href="/shop"
               className="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-sm rounded-full shadow-xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Sparkles className="w-4 h-4" /> Design in 2D Studio
+              Explore Real Qikink Collection <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/shop"
+              href="/admin/orders"
               className="w-full sm:w-auto px-8 py-4 bg-brand-card/80 text-brand-pearl border border-brand-border hover:border-brand-gold font-bold text-sm rounded-full backdrop-blur-md transition-all flex items-center justify-center gap-2"
             >
-              Explore Collection <ArrowRight className="w-4 h-4" />
+              Sync New Qikink Product ID
             </Link>
           </div>
 
@@ -72,38 +84,40 @@ export default function HomePage() {
               <p className="text-xs text-brand-muted mt-0.5">Express Delivery Across India</p>
             </div>
             <div className="glass-panel p-4 rounded-2xl border border-brand-border">
-              <span className="text-2xl font-black text-brand-gold">4.9 / 5.0</span>
-              <p className="text-xs text-brand-muted mt-0.5">Customer Quality Rating</p>
+              <span className="text-2xl font-black text-brand-gold">Qikink API</span>
+              <p className="text-xs text-brand-muted mt-0.5">Real-Time Sync Engine</p>
             </div>
           </div>
 
         </div>
       </section>
 
-      {/* FEATURED DROPS */}
+      {/* FEATURED REAL QIKINK PRODUCTS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-brand-border pb-4">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
-              <Flame className="w-4 h-4 text-amber-500" /> Limited Atelier Drops
+              <Flame className="w-4 h-4 text-amber-500" /> Real Qikink API Products
             </span>
-            <h2 className="text-3xl font-extrabold text-brand-pearl mt-1">Featured Bespoke Pieces</h2>
+            <h2 className="text-3xl font-extrabold text-brand-pearl mt-1">Authentic Qikink Catalog Drops</h2>
           </div>
           <Link href="/shop" className="text-xs font-bold text-brand-gold hover:underline flex items-center gap-1">
             View All Drops <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
-
-      {/* EMBEDDED BESPOKE STUDIO TEASER */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <CustomizerStudio />
+        {loading ? (
+          <div className="py-16 text-center space-y-3">
+            <div className="w-8 h-8 border-2 border-brand-gold border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs text-brand-muted font-mono">Fetching live Qikink catalog products...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* BRAND VALUES / ZERO INVENTORY PROMISE */}
@@ -115,7 +129,7 @@ export default function HomePage() {
             </div>
             <h3 className="text-xl font-bold text-brand-pearl">Zero-Inventory Fashion</h3>
             <p className="text-xs text-brand-muted leading-relaxed">
-              Fast fashion produces 92 million tons of textile landfill waste per year. KultZR prints every garment specifically for you upon purchase.
+              KultZR prints every garment specifically for you upon purchase via Qikink Open API automated fulfillment.
             </p>
           </div>
 
@@ -133,15 +147,15 @@ export default function HomePage() {
             <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
               <Sparkles className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-brand-pearl">Empowered Expression</h3>
+            <h3 className="text-xl font-bold text-brand-pearl">Automated Fulfillment</h3>
             <p className="text-xs text-brand-muted leading-relaxed">
-              Your attire should make a statement. Add your quote, name, or story emblem to create a piece that is 100% unique to you.
+              Orders placed on KultZR automatically trigger live printing, packaging, and shipping directly from Qikink.
             </p>
           </div>
         </div>
       </section>
 
-      {/* UGC TESTIMONIALS */}
+      {/* COMMUNITY TESTIMONIALS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center space-y-2 max-w-xl mx-auto">
           <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">#WearYourStory Community</span>
@@ -169,7 +183,7 @@ export default function HomePage() {
               <p className="text-xs text-brand-pearl italic">&quot;{story.text}&quot;</p>
               
               <div className="pt-2 border-t border-brand-border/60 text-[10px] text-brand-gold font-semibold">
-                Custom Piece: &quot;{story.storyTag}&quot;
+                Piece: &quot;{story.storyTag}&quot;
               </div>
             </div>
           ))}
@@ -181,8 +195,8 @@ export default function HomePage() {
         <div className="relative glass-panel p-8 sm:p-12 rounded-3xl border border-brand-gold/40 text-center space-y-6 overflow-hidden">
           <div className="space-y-2 max-w-xl mx-auto">
             <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">Join The KultZR Circle</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-pearl">Unlock 15% Off Your First Bespoke Piece</h2>
-            <p className="text-xs text-brand-muted">Subscribe for exclusive story drop access, custom emblem unlocks, and secret discounts.</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-pearl">Unlock 15% Off Your First Piece</h2>
+            <p className="text-xs text-brand-muted">Subscribe for exclusive story drop access and secret discounts.</p>
           </div>
 
           <form onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing to KultZR!'); }} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
