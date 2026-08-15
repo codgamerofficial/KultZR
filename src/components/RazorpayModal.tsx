@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { OrderShippingAddress } from '@/lib/types';
-import { ShieldCheck, Lock, CheckCircle2, CreditCard, Smartphone, Building2, ExternalLink } from 'lucide-react';
+import { ShieldCheck, Lock, CreditCard, Smartphone, Building2, ExternalLink, Info } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface RazorpayModalProps {
@@ -123,9 +123,9 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
             </div>
             <div>
               <h3 className="font-extrabold text-lg flex items-center gap-1.5">
-                Razorpay Checkout Gateway <Lock className="w-4 h-4 text-emerald-400" />
+                Razorpay Payment Gateway <Lock className="w-4 h-4 text-emerald-400" />
               </h3>
-              <p className="text-xs text-brand-muted">KultZR Verified Merchant (rzp_test_TQ7Cdpi6W4Balz)</p>
+              <p className="text-xs text-brand-muted">KultZR Merchant ID (rzp_test_TQ7Cdpi6W4Balz)</p>
             </div>
           </div>
           <button onClick={onClose} className="text-brand-muted hover:text-brand-pearl text-sm font-bold">
@@ -143,6 +143,16 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
             <p className="font-semibold text-brand-pearl">{customerAddress.full_name}</p>
             <p>{customerAddress.email}</p>
           </div>
+        </div>
+
+        {/* Test Mode Explanation Banner */}
+        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 space-y-1">
+          <div className="flex items-center gap-1.5 font-bold text-brand-gold">
+            <Info className="w-4 h-4 shrink-0 text-brand-gold" /> Test Mode Active (rzp_test_TQ7Cdpi6W4Balz)
+          </div>
+          <p className="text-[11px] text-amber-200/90 leading-relaxed">
+            Real phone UPI apps (Google Pay/PhonePe) block Test QR codes because no real money is deducted in Sandbox mode. To complete test payment, click <strong>&quot;Success&quot;</strong> in the Razorpay popup.
+          </p>
         </div>
 
         {/* Payment Options Preview */}
@@ -187,25 +197,6 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
           </div>
         </div>
 
-        {/* Selected Method Details */}
-        <div className="p-4 rounded-xl bg-brand-card/50 border border-brand-border/60 text-xs space-y-2">
-          {selectedMethod === 'upi' && (
-            <p className="text-brand-pearl leading-relaxed">
-              Instant checkout via Google Pay, PhonePe, Paytm, BHIM, or any UPI app.
-            </p>
-          )}
-          {selectedMethod === 'card' && (
-            <p className="text-brand-pearl leading-relaxed">
-              Supports Visa, MasterCard, RuPay, Maestro, and Diners Club Credit & Debit Cards.
-            </p>
-          )}
-          {selectedMethod === 'netbanking' && (
-            <p className="text-brand-pearl leading-relaxed">
-              Direct NetBanking for HDFC Bank, ICICI Bank, SBI, Axis Bank, Kotak, and 50+ Indian banks.
-            </p>
-          )}
-        </div>
-
         {/* Launch Razorpay SDK CTA */}
         <button
           onClick={handleOpenLiveRazorpaySDK}
@@ -214,11 +205,11 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
         >
           {processing ? (
             <span className="flex items-center gap-2 animate-pulse">
-              <Lock className="w-4 h-4 animate-spin" /> Launching Razorpay SDK Window...
+              <Lock className="w-4 h-4 animate-spin" /> Launching Razorpay Window...
             </span>
           ) : (
             <span className="flex items-center gap-2">
-              <ExternalLink className="w-5 h-5" /> Pay ₹{amount.toLocaleString('en-IN')} via Razorpay
+              <ExternalLink className="w-5 h-5" /> Launch Razorpay Window (₹{amount.toLocaleString('en-IN')})
             </span>
           )}
         </button>
