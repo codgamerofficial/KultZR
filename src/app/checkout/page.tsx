@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/lib/cartContext';
+import { useAuth } from '@/lib/authContext';
 import { OrderShippingAddress } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import RazorpayModal from '@/components/RazorpayModal';
-import { ShieldCheck, ArrowRight, CheckCircle2, Lock, Sparkles } from 'lucide-react';
+import { ShieldCheck, ArrowRight, CheckCircle2, Lock, Sparkles, User } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
+  const { user, profile } = useAuth();
   const [showRazorpay, setShowRazorpay] = useState(false);
   const [orderComplete, setOrderComplete] = useState<{ paymentId: string; orderId: string } | null>(null);
 
@@ -25,6 +27,18 @@ export default function CheckoutPage() {
     country: 'India',
   });
 
+  // Auto prefill address if user profile is available
+  useEffect(() => {
+    if (profile || user) {
+      setAddress(prev => ({
+        ...prev,
+        full_name: profile?.full_name || prev.full_name,
+        email: user?.email || prev.email,
+        phone: profile?.phone || prev.phone,
+      }));
+    }
+  }, [profile, user]);
+
   const handleSubmitAddress = (e: React.FormEvent) => {
     e.preventDefault();
     if (!address.full_name || !address.email || !address.address_line1 || !address.pincode) {
@@ -38,11 +52,12 @@ export default function CheckoutPage() {
     setShowRazorpay(false);
     setOrderComplete({ paymentId, orderId });
 
-    // 1. Save order to Supabase live database if configured
+    // Save order to Supabase live database linked with user_id
     if (isSupabaseConfigured) {
       try {
         const { data: orderData, error: orderError } = await supabase.from('orders').insert({
           order_number: orderId,
+          user_id: user?.id || null,
           customer_email: address.email,
           customer_name: address.full_name,
           shipping_address: address,
@@ -74,7 +89,7 @@ export default function CheckoutPage() {
       }
     }
 
-    // 2. Trigger Print-on-Demand fulfillment webhook
+    // Trigger Print-on-Demand fulfillment webhook
     try {
       await fetch('/api/webhooks/pod', {
         method: 'POST',
@@ -82,6 +97,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           orderId,
           paymentId,
+          userId: user?.id,
           items: cart,
           shippingAddress: address,
         })
@@ -170,9 +186,17 @@ export default function CheckoutPage() {
         
         {/* Address Form (7 Cols) */}
         <form onSubmit={handleSubmitAddress} className="lg:col-span-7 glass-panel p-6 sm:p-8 rounded-3xl border border-brand-border space-y-6">
-          <h3 className="font-extrabold text-lg text-brand-pearl border-b border-brand-border pb-4">
-            1. Shipping & Contact Information
-          </h3>
+          
+          <div className="flex items-center justify-between border-b border-brand-border pb-4">
+            <h3 className="font-extrabold text-lg text-brand-pearl">
+              1. Shipping & Contact Information
+            </h3>
+            {user && (
+              <span className="text-xs text-brand-gold font-bold flex items-center gap-1">
+                <User className="w-3.5 h-3.5" /> Logged in as {user.email}
+              </span>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
