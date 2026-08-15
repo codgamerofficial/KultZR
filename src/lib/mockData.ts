@@ -2,6 +2,87 @@ import { Product } from './types';
 
 export const MOCK_PRODUCTS: Product[] = [
   {
+    id: 'qikink-64609138',
+    title: 'Unisex Ringer T-Shirt',
+    slug: 'unisex-ringer-t-shirt-64609138',
+    category_slug: 'unisex',
+    gender: 'unisex',
+    price: 799,
+    original_price: 1299,
+    description: 'Qikink Product ID: 64609138. High-density 240 GSM organic cotton contrast ringer tee. 4 Colors, 24 Variants (Size XS - XXL). On-demand zero-inventory printing.',
+    story: 'Clean retro sportswear silhouette meets modern luxury streetwear storytelling.',
+    fabric_details: '100% Combed Organic Cotton • 240 GSM Contrast Ringer • Pre-Shrunk • Qikink Product ID 64609138',
+    images: [
+      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=1000',
+    ],
+    colors: [
+      { name: 'Red / White Accent', hex: '#E54D42' },
+      { name: 'Obsidian Black', hex: '#0A0A0C' },
+      { name: 'Royal Blue / White', hex: '#2B6CB0' },
+      { name: 'Pearl White', hex: '#FAFAFA' }
+    ],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    is_customizable: true,
+    is_featured: true,
+    rating: 4.95,
+    review_count: 48
+  },
+  {
+    id: 'qikink-63665902',
+    title: 'GT Unisex Varsity Jacket',
+    slug: 'gt-unisex-varsity-jacket-63665902',
+    category_slug: 'unisex',
+    gender: 'unisex',
+    price: 1499,
+    original_price: 2499,
+    description: 'Qikink Product ID: 63665902. GujaratTitans Edition heavy fleece satin-lined varsity jacket. 6 Colors, 42 Variants (Size XS - 3XL).',
+    story: 'Sovereignty on the street. Designed for high-density chest emblems and back statements.',
+    fabric_details: 'Heavyweight Fleece Satin Lined • Premium Ribbed Cuffs • Snap Buttons • Qikink Product ID 63665902',
+    images: [
+      'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=1000',
+    ],
+    colors: [
+      { name: 'Lavender Purple / White', hex: '#8B5CF6' },
+      { name: 'Navy Blue / White', hex: '#1E3A8A' },
+      { name: 'Obsidian Black', hex: '#0A0A0C' },
+      { name: 'Emerald Green', hex: '#059669' }
+    ],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'],
+    is_customizable: true,
+    is_featured: true,
+    rating: 4.98,
+    review_count: 64
+  },
+  {
+    id: 'qikink-63665896',
+    title: 'DC Unisex Varsity Jacket',
+    slug: 'dc-unisex-varsity-jacket-63665896',
+    category_slug: 'unisex',
+    gender: 'unisex',
+    price: 1499,
+    original_price: 2499,
+    description: 'Qikink Product ID: 63665896. DelhiCapitals Edition atelier fleece varsity jacket. 6 Colors, 42 Variants (Size XS - 3XL).',
+    story: 'Crafted in silence, speaks in thunder. Tailored for bespoke personalization.',
+    fabric_details: 'Heavyweight Fleece Satin Lined • Custom Ribbing • Qikink Product ID 63665896',
+    images: [
+      'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1000',
+    ],
+    colors: [
+      { name: 'Royal Blue / White', hex: '#2563EB' },
+      { name: 'Navy / White', hex: '#1E3A8A' },
+      { name: 'Obsidian Black', hex: '#0A0A0C' },
+      { name: 'Crimson Red', hex: '#DC2626' }
+    ],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'],
+    is_customizable: true,
+    is_featured: true,
+    rating: 4.92,
+    review_count: 39
+  },
+  {
     id: 'prod-001',
     title: 'The Identity Oversized Tee',
     slug: 'the-identity-oversized-tee',
@@ -54,137 +135,35 @@ export const MOCK_PRODUCTS: Product[] = [
     is_featured: true,
     rating: 4.95,
     review_count: 52
-  },
-  {
-    id: 'prod-003',
-    title: 'Visionary Minimalist Drop-Shoulder Tee',
-    slug: 'visionary-minimalist-drop-shoulder-tee',
-    category_slug: 'men',
-    gender: 'men',
-    price: 1699,
-    original_price: 2199,
-    description: 'Clean architectural cut featuring dropped shoulders and subtle branding. Tailored for urban effortless style.',
-    story: 'Less is more. Designed for the quiet leaders shaping tomorrow.',
-    fabric_details: '100% Ring-Spun Cotton • 220 GSM • Pre-shrunk • Reinforced collar',
-    images: [
-      'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1618354691229-88d47f28e742?auto=format&fit=crop&q=80&w=1000',
-    ],
-    colors: [
-      { name: 'Obsidian Black', hex: '#0A0A0C' },
-      { name: 'Deep Sage', hex: '#3B4D3C' },
-      { name: 'Pearl White', hex: '#FAFAFA' }
-    ],
-    sizes: ['S', 'M', 'L', 'XL'],
-    is_customizable: true,
-    is_featured: false,
-    rating: 4.8,
-    review_count: 19
-  },
-  {
-    id: 'prod-004',
-    title: 'Empowered Statement Cropped Hoodie',
-    slug: 'empowered-statement-cropped-hoodie',
-    category_slug: 'women',
-    gender: 'women',
-    price: 2999,
-    original_price: 3699,
-    description: 'Cropped hem, raw edge detail, and high-density cotton structure. Personalize with your custom mantra.',
-    story: 'Unapologetic expression. Created for women who carve their own path.',
-    fabric_details: '95% Premium French Terry Cotton, 5% Elastane • 320 GSM • Raw Cut Hem',
-    images: [
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&q=80&w=1000',
-    ],
-    colors: [
-      { name: 'Pearl White', hex: '#FAFAFA' },
-      { name: 'Rose Gold Amber', hex: '#D4AF37' },
-      { name: 'Charcoal Black', hex: '#141418' }
-    ],
-    sizes: ['XS', 'S', 'M', 'L'],
-    is_customizable: true,
-    is_featured: true,
-    rating: 4.9,
-    review_count: 27
-  },
-  {
-    id: 'prod-005',
-    title: 'KultZR Signature Canvas Tote',
-    slug: 'kultzr-signature-canvas-tote',
-    category_slug: 'accessories',
-    gender: 'accessories',
-    price: 899,
-    original_price: 1299,
-    description: 'Heavyweight organic canvas bag with reinforced handles. Customize with your quote, insignia, or art.',
-    story: 'Carry your story wherever you roam. Sustainable zero-plastic canvas tote.',
-    fabric_details: '100% Unbleached Heavy Canvas • 400 GSM • Inner zippered pocket • Reinforced stitching',
-    images: [
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=1000',
-    ],
-    colors: [
-      { name: 'Natural Oatmeal', hex: '#EBE6DD' },
-      { name: 'Obsidian Black', hex: '#0A0A0C' }
-    ],
-    sizes: ['One Size'],
-    is_customizable: true,
-    is_featured: false,
-    rating: 4.85,
-    review_count: 41
-  },
-  {
-    id: 'prod-006',
-    title: 'Artisan Embroidered Snapback Cap',
-    slug: 'artisan-embroidered-snapback-cap',
-    category_slug: 'accessories',
-    gender: 'accessories',
-    price: 1199,
-    original_price: 1599,
-    description: 'Structured 6-panel hat with brass buckle closure. Custom 3D thread embroidery options available.',
-    story: 'Crown your identity with precision craft.',
-    fabric_details: '100% Heavy Twill Cotton • Brass hardware • Moisture-wicking sweatband',
-    images: [
-      'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&q=80&w=1000',
-    ],
-    colors: [
-      { name: 'Obsidian Black', hex: '#0A0A0C' },
-      { name: 'Vintage Olive', hex: '#4B5320' }
-    ],
-    sizes: ['Adjustable'],
-    is_customizable: true,
-    is_featured: false,
-    rating: 4.75,
-    review_count: 14
   }
 ];
 
 export const MOCK_TESTIMONIALS = [
   {
-    id: '1',
-    name: 'Aysha Khan',
-    role: 'Visual Artist',
+    id: 't-1',
+    name: 'Devendra V.',
+    role: 'Creative Director',
+    text: 'The 240 GSM organic fabric quality is insane. Customizing my quote on the back felt like designing my own luxury brand line.',
+    rating: 5,
+    storyTag: 'Unapologetically Self-Made',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-    text: 'I uploaded my grandmother’s traditional motif onto the Identity Oversized Tee. The print clarity and cotton quality are unreal!',
-    rating: 5,
-    storyTag: '#MyGrandmotherLegacy'
   },
   {
-    id: '2',
-    name: 'Rohan Verma',
-    role: 'Tech Founder',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
-    text: 'Zero waste, custom made, and delivered in 4 days. KultZR is the future of conscious streetwear.',
+    id: 't-2',
+    name: 'Ananya S.',
+    role: 'Product Designer',
+    text: 'Zero inventory on-demand printing done right. Ordered the Unisex Ringer Tee with my emblem and it arrived in 4 days.',
     rating: 5,
-    storyTag: '#CodeAndCanvas'
-  },
-  {
-    id: '3',
-    name: 'Devika Nair',
-    role: 'Architect',
+    storyTag: 'Wear Your Legacy',
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=200',
-    text: 'The Customizer Studio let me place my architectural mantra right on the sleeve. Fits like a designer luxury piece.',
+  },
+  {
+    id: 't-3',
+    name: 'Rohan K.',
+    role: 'Founder',
+    text: 'Wear Your Story is not just a slogan. The 2D Bespoke Studio makes high-density custom streetwear effortless.',
     rating: 5,
-    storyTag: '#StructuralMinimalism'
+    storyTag: 'Code & Canvas',
+    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=200',
   }
 ];
