@@ -1,26 +1,22 @@
 -- KultZR Master Supabase PostgreSQL Database Schema
 -- Comprehensive Schema for Qikink Open API Sync, AI Catalog Intelligence, Multidimensional Filters, and Order Engine
 
--- Enable UUID extension
+-- Enable Extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- =================================================═
--- 1. CATEGORIES & TAXONOMY (MEN, WOMEN, UNISEX, ACCESSORIES)
--- =================================================═
+-- 1. CATEGORIES & TAXONOMY
 CREATE TABLE IF NOT EXISTS public.categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
-    gender VARCHAR(50) DEFAULT 'Unisex', -- Men, Women, Unisex, Accessories
+    gender VARCHAR(50) DEFAULT 'Unisex',
     parent_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
     description TEXT,
     image_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================═
--- 2. COLLECTIONS (New Drops, Essentials, Street Culture, Minimal, etc.)
--- =================================================═
+-- 2. COLLECTIONS
 CREATE TABLE IF NOT EXISTS public.collections (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
@@ -31,9 +27,7 @@ CREATE TABLE IF NOT EXISTS public.collections (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================═
--- 3. MASTER KULTZR PRODUCTS TABLE
--- =================================================═
+-- 3. PRODUCTS TABLE
 CREATE TABLE IF NOT EXISTS public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug VARCHAR(255) NOT NULL UNIQUE,
@@ -43,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     gender VARCHAR(50) DEFAULT 'Unisex',
     category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
     collection_id UUID REFERENCES public.collections(id) ON DELETE SET NULL,
-    status VARCHAR(50) DEFAULT 'PUBLISHED', -- DISCOVERED, IMPORTING, NORMALIZING, AI_PROCESSING, VALIDATING, AI_REVIEW, APPROVED, PUBLISHED, REJECTED, UNAVAILABLE
+    status VARCHAR(50) DEFAULT 'PUBLISHED',
     brand VARCHAR(100) DEFAULT 'KultZR',
     base_cost NUMERIC DEFAULT 0,
     selling_price NUMERIC NOT NULL,
@@ -62,7 +56,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Product Images
+-- PRODUCT IMAGES
 CREATE TABLE IF NOT EXISTS public.product_images (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
@@ -73,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.product_images (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Product Variants (Size, Color, SKU)
+-- PRODUCT VARIANTS
 CREATE TABLE IF NOT EXISTS public.product_variants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
@@ -82,12 +76,12 @@ CREATE TABLE IF NOT EXISTS public.product_variants (
     color_name VARCHAR(100) NOT NULL,
     color_hex VARCHAR(20) DEFAULT '#0A0A0C',
     price NUMERIC NOT NULL,
-    stock_status VARCHAR(50) DEFAULT 'AVAILABLE', -- AVAILABLE, LOW_AVAILABILITY, OUT_OF_STOCK, DISCONTINUED, SYNC_UNKNOWN
+    stock_status VARCHAR(50) DEFAULT 'AVAILABLE',
     inventory_qty INTEGER DEFAULT 999,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tags
+-- TAGS
 CREATE TABLE IF NOT EXISTS public.tags (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -100,12 +94,10 @@ CREATE TABLE IF NOT EXISTS public.product_tags (
     PRIMARY KEY (product_id, tag_id)
 );
 
--- =================================================═
--- 4. PROVIDER MAPPING TABLES (Qikink / Printful)
--- =================================================═
+-- 4. PROVIDER TABLES
 CREATE TABLE IF NOT EXISTS public.providers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL UNIQUE, -- QIKINK, PRINTFUL
+    name VARCHAR(100) NOT NULL UNIQUE,
     code VARCHAR(50) NOT NULL UNIQUE,
     is_active BOOLEAN DEFAULT TRUE,
     config JSONB,
@@ -146,16 +138,14 @@ CREATE TABLE IF NOT EXISTS public.product_provider_mappings (
     PRIMARY KEY (product_id, provider_product_id)
 );
 
--- =================================================═
--- 5. SYNC RUNS & LOGGING ENGINE
--- =================================================═
+-- 5. SYNC RUNS
 CREATE TABLE IF NOT EXISTS public.sync_runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     run_number VARCHAR(100) NOT NULL UNIQUE,
     provider_name VARCHAR(50) DEFAULT 'QIKINK',
     started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     completed_at TIMESTAMP WITH TIME ZONE,
-    status VARCHAR(50) DEFAULT 'RUNNING', -- RUNNING, COMPLETED, FAILED
+    status VARCHAR(50) DEFAULT 'RUNNING',
     products_scanned INTEGER DEFAULT 0,
     products_created INTEGER DEFAULT 0,
     products_updated INTEGER DEFAULT 0,
@@ -168,20 +158,18 @@ CREATE TABLE IF NOT EXISTS public.sync_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     run_id UUID REFERENCES public.sync_runs(id) ON DELETE CASCADE,
     event_type VARCHAR(100) NOT NULL,
-    severity VARCHAR(20) DEFAULT 'INFO', -- INFO, WARNING, ERROR
+    severity VARCHAR(20) DEFAULT 'INFO',
     message TEXT NOT NULL,
     payload JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================═
--- 6. AI JOBS & REVIEWS (NVIDIA NIM GLM-5.2 Engine)
--- =================================================═
+-- 6. AI JOBS & REVIEWS
 CREATE TABLE IF NOT EXISTS public.ai_jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
     provider_product_id VARCHAR(255),
-    status VARCHAR(50) DEFAULT 'PENDING', -- PENDING, PROCESSING, COMPLETED, FAILED
+    status VARCHAR(50) DEFAULT 'PENDING',
     model_name VARCHAR(100) DEFAULT 'z-ai/glm-5.2',
     input_prompt TEXT,
     raw_response JSONB,
@@ -192,7 +180,7 @@ CREATE TABLE IF NOT EXISTS public.ai_jobs (
 CREATE TABLE IF NOT EXISTS public.ai_reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
-    review_status VARCHAR(50) DEFAULT 'AI_REVIEW', -- AI_REVIEW, APPROVED, REJECTED
+    review_status VARCHAR(50) DEFAULT 'AI_REVIEW',
     confidence_score NUMERIC DEFAULT 0.95,
     ai_suggestions JSONB,
     reviewer_notes TEXT,
@@ -200,13 +188,11 @@ CREATE TABLE IF NOT EXISTS public.ai_reviews (
     approved_at TIMESTAMP WITH TIME ZONE
 );
 
--- =================================================═
--- 7. DETERMINISTIC PRICING ENGINE
--- =================================================═
+-- 7. PRICING RULES
 CREATE TABLE IF NOT EXISTS public.pricing_rules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
-    target_profit_margin NUMERIC DEFAULT 300, -- Fixed or % margin
+    target_profit_margin NUMERIC DEFAULT 300,
     shipping_fee_buffer NUMERIC DEFAULT 70,
     payment_fee_pct NUMERIC DEFAULT 2.36,
     tax_buffer_pct NUMERIC DEFAULT 5.0,
@@ -224,9 +210,7 @@ CREATE TABLE IF NOT EXISTS public.price_history (
     changed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================═
--- 8. CUSTOMER & USER ACCOUNTS
--- =================================================═
+-- 8. CUSTOMER PROFILES
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
@@ -253,9 +237,7 @@ CREATE TABLE IF NOT EXISTS public.customer_addresses (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================═
--- 9. ORDERS, PAYMENTS & FULFILLMENT TRACKING
--- =================================================═
+-- 9. ORDERS & PAYMENTS
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number VARCHAR(100) NOT NULL UNIQUE,
@@ -265,8 +247,8 @@ CREATE TABLE IF NOT EXISTS public.orders (
     shipping_address JSONB NOT NULL,
     total_amount NUMERIC NOT NULL,
     currency VARCHAR(10) DEFAULT 'INR',
-    payment_status VARCHAR(50) DEFAULT 'pending', -- pending, paid, failed, refunded
-    order_status VARCHAR(50) DEFAULT 'processing', -- PENDING_PAYMENT, PAID, FULFILLMENT_SUBMITTED, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    payment_status VARCHAR(50) DEFAULT 'pending',
+    order_status VARCHAR(50) DEFAULT 'processing',
     razorpay_order_id VARCHAR(255),
     razorpay_payment_id VARCHAR(255),
     beneficiary_upi VARCHAR(100) DEFAULT 'kultzr@slc',
@@ -302,9 +284,7 @@ CREATE TABLE IF NOT EXISTS public.tracking_events (
     event_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================═
--- 10. SYSTEM SETTINGS & AUDIT LOGS
--- =================================================═
+-- 10. SYSTEM SETTINGS
 CREATE TABLE IF NOT EXISTS public.system_settings (
     key VARCHAR(100) PRIMARY KEY,
     value JSONB NOT NULL,
@@ -321,9 +301,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================═
--- 11. ROW LEVEL SECURITY (RLS) POLICIES
--- =================================================═
+-- 11. ROW LEVEL SECURITY
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.collections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;

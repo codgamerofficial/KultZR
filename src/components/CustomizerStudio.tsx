@@ -133,7 +133,7 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* LEFT COLUMN: Garment Mockup Live 2D Canvas (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col items-center justify-center p-6 sm:p-10 rounded-3xl bg-brand-dark/90 border border-brand-border relative min-h-[460px] overflow-hidden group">
+        <div className="lg:col-span-7 flex flex-col items-center justify-center p-6 sm:p-10 rounded-3xl bg-brand-dark/90 border border-brand-border relative min-h-115 overflow-hidden group">
           
           {/* Subtle Ambient Studio Light */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
@@ -180,7 +180,7 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
                     color: selectedTextColor,
                     textShadow: '0 2px 8px rgba(0,0,0,0.85)'
                   }}
-                  className="text-base sm:text-lg md:text-xl font-extrabold tracking-wide leading-tight break-words max-w-full drop-shadow-xl uppercase"
+                  className="text-base sm:text-lg md:text-xl font-extrabold tracking-wide leading-tight wrap-break-word max-w-full drop-shadow-xl uppercase"
                 >
                   {customText}
                 </p>
