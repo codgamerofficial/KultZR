@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { ShieldCheck, Package, Truck, Clock, RefreshCw, CheckCircle2, Search, Filter, Sparkles, Bot, Cpu } from 'lucide-react';
+import { ShieldCheck, Package, Truck, Clock, RefreshCw, CheckCircle2, Search, Filter, Sparkles, Bot, Cpu, Link2, Plus, ArrowUpRight } from 'lucide-react';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -16,6 +16,14 @@ export default function AdminOrdersPage() {
   const [aiQuote, setAiQuote] = useState('STAY UNAPOLOGETIC');
   const [aiResult, setAiResult] = useState<any>(null);
   const [aiTesting, setAiTesting] = useState(false);
+
+  // Qikink Product Importer state
+  const [qikinkProductId, setQikinkProductId] = useState('64609138');
+  const [qikinkTitle, setQikinkTitle] = useState('Unisex Ringer T-Shirt');
+  const [qikinkPrice, setQikinkPrice] = useState('499');
+  const [qikinkCategory, setQikinkCategory] = useState('T-Shirts');
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState('');
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -87,6 +95,34 @@ export default function AdminOrdersPage() {
     setAiTesting(false);
   };
 
+  const handleSyncQikinkProduct = async () => {
+    setSyncing(true);
+    setSyncMessage('');
+    try {
+      const res = await fetch('/api/qikink/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: qikinkProductId,
+          title: qikinkTitle,
+          price: Number(qikinkPrice) || 499,
+          category: qikinkCategory,
+          image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800',
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setSyncMessage(`✓ Success: ${data.message}`);
+      } else {
+        setSyncMessage(`⨯ Error: ${data.error || 'Failed to sync'}`);
+      }
+    } catch (err) {
+      setSyncMessage('⨯ Network error syncing product');
+    }
+    setSyncing(false);
+  };
+
   const totalRevenue = orders.reduce((acc, o) => acc + (Number(o.total_amount) || 0), 0);
 
   return (
@@ -98,9 +134,9 @@ export default function AdminOrdersPage() {
           <span className="text-xs font-bold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" /> KultZR Atelier Admin Portal
           </span>
-          <h1 className="text-3xl font-black text-brand-pearl">Merchant Order Management</h1>
+          <h1 className="text-3xl font-black text-brand-pearl">Merchant Order & Store Management</h1>
           <p className="text-xs text-brand-muted mt-1">
-            Manage print-on-demand fulfillment stages, customer deliveries, and sales revenue.
+            Manage print-on-demand fulfillment stages, Qikink store sync, and sales revenue.
           </p>
         </div>
 
@@ -112,6 +148,102 @@ export default function AdminOrdersPage() {
           <div className="px-4 py-2 rounded-2xl bg-brand-dark border border-brand-gold/40 text-xs">
             <span className="text-brand-muted">Total Revenue</span>
             <p className="text-xl font-extrabold text-brand-gold">₹{totalRevenue.toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* QIKINK STORE INTEGRATION & PRODUCT IMPORTER TOOL */}
+      <div className="glass-panel p-6 rounded-3xl border border-orange-500/40 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-border pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Link2 className="w-5 h-5 text-orange-400" />
+              <h3 className="text-base font-extrabold text-brand-pearl">Qikink Custom Store Direct Integration</h3>
+            </div>
+            <p className="text-xs text-brand-muted mt-0.5">
+              Import products directly by Qikink Product ID (e.g. 64609138) and link your KultZR store webhooks.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-bold">
+            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+              Client ID Linked: 787412766423348
+            </span>
+          </div>
+        </div>
+
+        {/* Store Setup Guidance Note */}
+        <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-xs text-orange-200 space-y-1.5">
+          <p className="font-bold flex items-center gap-1 text-orange-300">
+            💡 Why Qikink says &quot;No store is linked to your account&quot; on Dashboard:
+          </p>
+          <p className="text-[11px] text-orange-100/90 leading-relaxed">
+            In Qikink&apos;s panel, the &quot;Push To Store&quot; button is designed exclusively for Shopify/WooCommerce plugins. For <strong>Custom Next.js / Supabase Websites</strong>, sync items below by entering your Qikink Product ID (e.g., <strong>64609138</strong>). When customers purchase on KultZR, our backend automatically places the order into Qikink with your Client ID!
+          </p>
+        </div>
+
+        {/* 1-Click Importer Form */}
+        <div className="space-y-3">
+          <span className="text-xs font-extrabold text-brand-pearl uppercase tracking-wider">1-Click Qikink Product Importer</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div>
+              <label className="text-brand-muted font-bold block mb-1">Qikink Product ID</label>
+              <input
+                type="text"
+                value={qikinkProductId}
+                onChange={(e) => setQikinkProductId(e.target.value)}
+                placeholder="e.g. 64609138"
+                className="w-full bg-brand-dark border border-brand-border rounded-xl p-2.5 text-brand-pearl focus:outline-none focus:border-brand-gold font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="text-brand-muted font-bold block mb-1">Product Title</label>
+              <input
+                type="text"
+                value={qikinkTitle}
+                onChange={(e) => setQikinkTitle(e.target.value)}
+                placeholder="e.g. Unisex Ringer T-Shirt"
+                className="w-full bg-brand-dark border border-brand-border rounded-xl p-2.5 text-brand-pearl focus:outline-none focus:border-brand-gold"
+              />
+            </div>
+
+            <div>
+              <label className="text-brand-muted font-bold block mb-1">Selling Price (₹)</label>
+              <input
+                type="number"
+                value={qikinkPrice}
+                onChange={(e) => setQikinkPrice(e.target.value)}
+                placeholder="499"
+                className="w-full bg-brand-dark border border-brand-border rounded-xl p-2.5 text-brand-pearl focus:outline-none focus:border-brand-gold font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="text-brand-muted font-bold block mb-1">Category</label>
+              <input
+                type="text"
+                value={qikinkCategory}
+                onChange={(e) => setQikinkCategory(e.target.value)}
+                placeholder="T-Shirts"
+                className="w-full bg-brand-dark border border-brand-border rounded-xl p-2.5 text-brand-pearl focus:outline-none focus:border-brand-gold"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <button
+              onClick={handleSyncQikinkProduct}
+              disabled={syncing}
+              className="w-full sm:w-auto px-6 py-2.5 bg-linear-to-r from-orange-500 to-amber-500 text-brand-dark font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 hover:opacity-95 cursor-pointer shadow-lg shadow-orange-500/20"
+            >
+              <Plus className="w-4 h-4" /> {syncing ? 'Syncing with AI Curation...' : 'Import & Sync Product to KultZR Catalog'}
+            </button>
+
+            {syncMessage && (
+              <span className={`text-xs font-bold ${syncMessage.startsWith('✓') ? 'text-emerald-400' : 'text-red-400'}`}>
+                {syncMessage}
+              </span>
+            )}
           </div>
         </div>
       </div>
