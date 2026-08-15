@@ -14,7 +14,7 @@ export const MOCK_PRODUCTS: Product[] = [
     fabric_details: '100% Combed Organic Cotton • 240 GSM Contrast Ringer • Pre-Shrunk • Qikink Product ID 64609138',
     images: [
       'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&q=80&w=1000',
     ],
     colors: [
       { name: 'Red / White Accent', hex: '#E54D42' },
@@ -94,9 +94,8 @@ export const MOCK_PRODUCTS: Product[] = [
     story: 'Every seam carries intent. "The Identity" represents your personal manifesto—bold, uncompromised, and authentically yours.',
     fabric_details: '100% Combed Organic Cotton • 240 GSM Heavyweight • Bio-Washed • Anti-Pilling',
     images: [
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=1000',
       'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1000',
     ],
     colors: [
       { name: 'Obsidian Black', hex: '#0A0A0C' },
