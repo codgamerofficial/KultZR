@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useCart } from '@/lib/cartContext';
 import { OrderShippingAddress } from '@/lib/types';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import RazorpayModal from '@/components/RazorpayModal';
 import { ShieldCheck, ArrowRight, CheckCircle2, Lock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -33,9 +34,62 @@ export default function CheckoutPage() {
     setShowRazorpay(true);
   };
 
-  const handlePaymentSuccess = (paymentId: string, orderId: string) => {
+  const handlePaymentSuccess = async (paymentId: string, orderId: string) => {
     setShowRazorpay(false);
     setOrderComplete({ paymentId, orderId });
+
+    // 1. Save order to Supabase live database if configured
+    if (isSupabaseConfigured) {
+      try {
+        const { data: orderData, error: orderError } = await supabase.from('orders').insert({
+          order_number: orderId,
+          customer_email: address.email,
+          customer_name: address.full_name,
+          shipping_address: address,
+          total_amount: cartTotal,
+          currency: 'INR',
+          payment_status: 'paid',
+          order_status: 'processing',
+          razorpay_order_id: orderId,
+          razorpay_payment_id: paymentId,
+        }).select().single();
+
+        if (!orderError && orderData) {
+          const orderItems = cart.map(item => ({
+            order_id: orderData.id,
+            product_id: item.product.id,
+            product_title: item.product.title,
+            product_image: item.product.images[0],
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color.name,
+            unit_price: item.product.price,
+            customization_details: item.customization || null,
+          }));
+
+          await supabase.from('order_items').insert(orderItems);
+        }
+      } catch (err) {
+        console.warn('Supabase DB order insert warning:', err);
+      }
+    }
+
+    // 2. Trigger Print-on-Demand fulfillment webhook
+    try {
+      await fetch('/api/webhooks/pod', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          paymentId,
+          items: cart,
+          shippingAddress: address,
+        })
+      });
+    } catch (e) {
+      console.warn('POD webhook call warning:', e);
+    }
+
     clearCart();
   };
 
@@ -47,20 +101,20 @@ export default function CheckoutPage() {
         </div>
 
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">Order Confirmed!</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">Payment Verified!</span>
           <h1 className="text-3xl sm:text-5xl font-black text-brand-pearl">Wear Your Story Soon!</h1>
           <p className="text-sm text-brand-muted max-w-md mx-auto">
-            Thank you, <span className="text-brand-pearl font-bold">{address.full_name}</span>. Your bespoke order has been sent directly to our zero-waste print atelier.
+            Thank you, <span className="text-brand-pearl font-bold">{address.full_name}</span>. Your payment has been confirmed via Razorpay. Your order is now being custom printed with zero waste.
           </p>
         </div>
 
         <div className="glass-panel p-6 rounded-2xl border border-brand-border text-left max-w-md mx-auto space-y-3 text-xs">
           <div className="flex justify-between border-b border-brand-border pb-2">
-            <span className="text-brand-muted">Order ID:</span>
+            <span className="text-brand-muted">Razorpay Order Ref:</span>
             <span className="font-bold text-brand-gold">{orderComplete.orderId}</span>
           </div>
           <div className="flex justify-between border-b border-brand-border pb-2">
-            <span className="text-brand-muted">Razorpay Payment Ref:</span>
+            <span className="text-brand-muted">Razorpay Payment ID:</span>
             <span className="font-mono text-brand-pearl">{orderComplete.paymentId}</span>
           </div>
           <div className="flex justify-between border-b border-brand-border pb-2">
@@ -107,7 +161,7 @@ export default function CheckoutPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <div className="space-y-2">
         <span className="text-xs font-bold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
-          <Lock className="w-4 h-4" /> Secure Checkout
+          <Lock className="w-4 h-4" /> Secure Razorpay Checkout
         </span>
         <h1 className="text-3xl sm:text-5xl font-black text-brand-pearl">Complete Your Order</h1>
       </div>
@@ -222,7 +276,7 @@ export default function CheckoutPage() {
 
           <button
             type="submit"
-            className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity shadow-xl shadow-amber-500/20"
+            className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity shadow-xl shadow-amber-500/20 cursor-pointer"
           >
             Proceed to Razorpay Payment Gateway <ArrowRight className="w-5 h-5" />
           </button>
