@@ -4,7 +4,7 @@ import Razorpay from 'razorpay';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { amount, currency = 'INR', customerAddress } = body;
+    const { amount, currency = 'INR', customerAddress, beneficiaryUpi = 'kultzr@slc' } = body;
 
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: 'Invalid order amount' }, { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
         receipt: receipt,
         notes: {
           merchant: 'KultZR – Wear Your Story',
+          beneficiary_upi: beneficiaryUpi,
           customer_name: customerAddress?.full_name || 'Valued Customer',
           customer_email: customerAddress?.email || '',
         }
@@ -41,7 +42,8 @@ export async function POST(request: Request) {
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         key: keyId,
-        message: 'Razorpay order created successfully'
+        beneficiary_upi: beneficiaryUpi,
+        message: 'Razorpay order created successfully for kultzr@slc'
       });
     } catch (apiErr: any) {
       console.warn('Razorpay Order API Notice (falling back to Direct Checkout mode):', apiErr?.message || apiErr);
@@ -51,6 +53,7 @@ export async function POST(request: Request) {
         amount: Math.round(amount * 100),
         currency: currency,
         key: keyId,
+        beneficiary_upi: beneficiaryUpi,
       });
     }
 

@@ -49,6 +49,7 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
           amount: amount,
           currency: 'INR',
           customerAddress: customerAddress,
+          beneficiaryUpi: 'kultzr@slc',
         })
       });
 
@@ -76,6 +77,11 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
             name: customerAddress.full_name,
             email: customerAddress.email,
             contact: customerAddress.phone,
+            vpa: 'kultzr@slc',
+          },
+          notes: {
+            merchant: 'KultZR – Wear Your Story',
+            beneficiary_upi: 'kultzr@slc',
           },
           theme: {
             color: '#D4AF37',
@@ -131,7 +137,7 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
               <h3 className="font-extrabold text-lg flex items-center gap-1.5">
                 Razorpay Payment Gateway <Lock className="w-4 h-4 text-emerald-400" />
               </h3>
-              <p className="text-xs text-brand-muted">KultZR Merchant ID (rzp_test_TQ7Cdpi6W4Balz)</p>
+              <p className="text-xs text-brand-muted">Beneficiary UPI: <span className="font-mono text-brand-gold font-bold">kultzr@slc</span></p>
             </div>
           </div>
           <button onClick={onClose} className="text-brand-muted hover:text-brand-pearl text-sm font-bold">
@@ -154,10 +160,10 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
         {/* Test Mode Explanation Banner */}
         <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 space-y-1">
           <div className="flex items-center gap-1.5 font-bold text-brand-gold">
-            <Info className="w-4 h-4 shrink-0 text-brand-gold" /> Test Mode Active (rzp_test_TQ7Cdpi6W4Balz)
+            <Info className="w-4 h-4 shrink-0 text-brand-gold" /> KultZR Beneficiary UPI Target: kultzr@slc
           </div>
           <p className="text-[11px] text-amber-200/90 leading-relaxed">
-            Real mobile phone apps (GPay/PhonePe) block Test QR codes because no real money is debited in Sandbox mode. To test payment, click <strong>&quot;UPI&quot;</strong> -&gt; <strong>&quot;Pay Now&quot;</strong> -&gt; <strong>&quot;Success&quot;</strong> in the Razorpay window.
+            Payment routed to official KultZR merchant handle <strong>kultzr@slc</strong>. In Sandbox test mode, click <strong>&quot;UPI&quot;</strong> -&gt; <strong>&quot;Pay Now&quot;</strong> -&gt; <strong>&quot;Success&quot;</strong>.
           </p>
         </div>
 
@@ -215,7 +221,7 @@ export default function RazorpayModal({ amount, customerAddress, onSuccess, onCl
             </span>
           ) : (
             <span className="flex items-center gap-2">
-              <ExternalLink className="w-5 h-5" /> Launch Razorpay Window (₹{amount.toLocaleString('en-IN')})
+              <ExternalLink className="w-5 h-5" /> Pay ₹{amount.toLocaleString('en-IN')} to kultzr@slc
             </span>
           )}
         </button>
