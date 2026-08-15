@@ -1,5 +1,5 @@
 -- KultZR Supabase PostgreSQL Database Schema
--- Execute in Supabase SQL Editor to provision database tables and Row Level Security (RLS)
+-- Execute in Supabase SQL Editor to provision tables, provider mappings, and Row Level Security (RLS)
 
 CREATE TABLE public.profiles (
     id UUID PRIMARY KEY,
@@ -24,7 +24,7 @@ CREATE TABLE public.categories (
 CREATE TABLE public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE,
     category_slug VARCHAR(255) NOT NULL,
     gender VARCHAR(50) NOT NULL,
     price NUMERIC NOT NULL,
@@ -39,6 +39,20 @@ CREATE TABLE public.products (
     is_featured BOOLEAN DEFAULT FALSE,
     rating NUMERIC DEFAULT 4.90,
     review_count INTEGER DEFAULT 18,
+    ai_status VARCHAR(50) DEFAULT 'PUBLISHED',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- POD Provider Mapping Table (Qikink / Printful / Printify)
+CREATE TABLE public.product_provider (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
+    provider_name VARCHAR(50) DEFAULT 'QIKINK',
+    provider_product_id VARCHAR(255) NOT NULL,
+    provider_sku VARCHAR(255) NOT NULL,
+    base_cost NUMERIC NOT NULL,
+    size VARCHAR(50) NOT NULL,
+    color VARCHAR(50) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -69,6 +83,8 @@ CREATE TABLE public.orders (
     order_status VARCHAR(50) DEFAULT 'processing',
     razorpay_order_id VARCHAR(255),
     razorpay_payment_id VARCHAR(255),
+    pod_provider VARCHAR(50) DEFAULT 'QIKINK',
+    pod_order_id VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -95,6 +111,7 @@ CREATE TABLE public.newsletter_subscribers (
 -- PostgreSQL / Supabase Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.product_provider ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.customizations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
@@ -102,6 +119,7 @@ ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow public read access to products" ON public.products FOR SELECT USING (TRUE);
 CREATE POLICY "Allow public read access to categories" ON public.categories FOR SELECT USING (TRUE);
+CREATE POLICY "Allow public read access to product_provider" ON public.product_provider FOR SELECT USING (TRUE);
 CREATE POLICY "Public order creation" ON public.orders FOR INSERT WITH CHECK (TRUE);
 CREATE POLICY "Public customization creation" ON public.customizations FOR INSERT WITH CHECK (TRUE);
 CREATE POLICY "Public newsletter subscription" ON public.newsletter_subscribers FOR INSERT WITH CHECK (TRUE);

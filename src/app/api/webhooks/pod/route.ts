@@ -1,50 +1,37 @@
 import { NextResponse } from 'next/server';
+import { getPODAdapter } from '@/lib/podAdapter';
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const { orderId, paymentId, items, shippingAddress } = body;
+    const body = await req.json();
+    console.log('[POD Webhook] Payment Received Event:', body);
 
-    if (!orderId || !paymentId || !items) {
-      return NextResponse.json({ error: 'Invalid POD payload' }, { status: 400 });
+    const { orderId, amount, customerAddress, items, isCod } = body;
+
+    if (!orderId || !customerAddress) {
+      return NextResponse.json({ error: 'Missing required order metadata' }, { status: 400 });
     }
 
-    // Format order payload for Print-on-Demand vendor API (e.g. Printful API v2)
-    const podOrderPayload = {
-      external_id: orderId,
-      recipient: {
-        name: shippingAddress.full_name,
-        address1: shippingAddress.address_line1,
-        city: shippingAddress.city,
-        state_code: shippingAddress.state,
-        country_code: 'IN',
-        zip: shippingAddress.pincode,
-        email: shippingAddress.email,
-        phone: shippingAddress.phone,
-      },
-      items: items.map((item: any) => ({
-        name: item.product_title || item.product?.title,
-        quantity: item.quantity,
-        retail_price: item.unit_price || item.product?.price,
-        customization: item.customization || item.customization_details,
-      })),
-      metadata: {
-        brand: 'KultZR – Wear Your Story',
-        fulfillment: 'On-Demand Zero Inventory',
-      }
-    };
+    // Select POD Adapter (Defaults to Qikink for India)
+    const podAdapter = getPODAdapter(customerAddress.country || 'IN');
 
-    console.log('[POD Webhook] Prepared order payload for fulfillment vendor:', podOrderPayload);
-
-    return NextResponse.json({
-      success: true,
-      order_id: orderId,
-      pod_status: 'forwarded_to_print_atelier',
-      vendor_reference: 'POD_KZ_' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-      message: 'Order successfully dispatched to print-on-demand fulfillment center.'
+    // Dispatch order to Qikink / Printful POD Engine
+    const fulfillmentResult = await podAdapter.createOrder({
+      orderId,
+      customerAddress,
+      items: items || [],
+      isCod: isCod || false,
     });
 
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'POD processing failed' }, { status: 500 });
+    return NextResponse.json({
+      message: 'Fulfillment successfully triggered',
+      provider: fulfillmentResult.provider,
+      pod_order_id: fulfillmentResult.podOrderId,
+      status: fulfillmentResult.status,
+      estimated_dispatch_days: fulfillmentResult.estimatedDispatchDays,
+    });
+  } catch (err) {
+    console.error('[POD Webhook] Handler Error:', err);
+    return NextResponse.json({ error: 'Internal server error processing fulfillment' }, { status: 500 });
   }
 }
