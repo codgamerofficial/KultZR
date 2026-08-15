@@ -2,13 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { ShieldCheck, Package, Truck, Clock, RefreshCw, CheckCircle2, Search, Filter } from 'lucide-react';
+import { ShieldCheck, Package, Truck, Clock, RefreshCw, CheckCircle2, Search, Filter, Sparkles, Bot, Cpu } from 'lucide-react';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // AI Generator Tester state
+  const [aiTitle, setAiTitle] = useState('Oversized Heavyweight Hoodie');
+  const [aiCategory, setAiCategory] = useState('Hoodies');
+  const [aiQuote, setAiQuote] = useState('STAY UNAPOLOGETIC');
+  const [aiResult, setAiResult] = useState<any>(null);
+  const [aiTesting, setAiTesting] = useState(false);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -57,6 +64,29 @@ export default function AdminOrdersPage() {
     setUpdatingId(null);
   };
 
+  const handleTestAiEnrichment = async () => {
+    setAiTesting(true);
+    try {
+      const res = await fetch('/api/ai/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rawTitle: aiTitle,
+          category: aiCategory,
+          customText: aiQuote,
+          emblemName: 'Phoenix Crest',
+        }),
+      });
+      const data = await res.json();
+      if (data.enrichedData) {
+        setAiResult(data.enrichedData);
+      }
+    } catch (err) {
+      console.error('AI Test Error:', err);
+    }
+    setAiTesting(false);
+  };
+
   const totalRevenue = orders.reduce((acc, o) => acc + (Number(o.total_amount) || 0), 0);
 
   return (
@@ -84,6 +114,70 @@ export default function AdminOrdersPage() {
             <p className="text-xl font-extrabold text-brand-gold">₹{totalRevenue.toLocaleString('en-IN')}</p>
           </div>
         </div>
+      </div>
+
+      {/* AI CATALOG CURATION TESTER */}
+      <div className="glass-panel p-6 rounded-3xl border border-amber-500/30 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-5 h-5 text-brand-gold" />
+            <h3 className="text-base font-extrabold text-brand-pearl">NVIDIA NIM & Hugging Face AI Catalog Generator</h3>
+          </div>
+          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/30 font-bold">
+            z-ai/glm-5.2 Active
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div>
+            <label className="text-brand-muted font-bold block mb-1">Product Title</label>
+            <input
+              type="text"
+              value={aiTitle}
+              onChange={(e) => setAiTitle(e.target.value)}
+              className="w-full bg-brand-dark border border-brand-border rounded-xl p-2.5 text-brand-pearl focus:outline-none focus:border-brand-gold"
+            />
+          </div>
+
+          <div>
+            <label className="text-brand-muted font-bold block mb-1">Category</label>
+            <input
+              type="text"
+              value={aiCategory}
+              onChange={(e) => setAiCategory(e.target.value)}
+              className="w-full bg-brand-dark border border-brand-border rounded-xl p-2.5 text-brand-pearl focus:outline-none focus:border-brand-gold"
+            />
+          </div>
+
+          <div>
+            <label className="text-brand-muted font-bold block mb-1">Custom Statement Quote</label>
+            <input
+              type="text"
+              value={aiQuote}
+              onChange={(e) => setAiQuote(e.target.value)}
+              className="w-full bg-brand-dark border border-brand-border rounded-xl p-2.5 text-brand-pearl focus:outline-none focus:border-brand-gold"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={handleTestAiEnrichment}
+          disabled={aiTesting}
+          className="px-5 py-2.5 bg-linear-to-r from-amber-400 to-brand-gold text-brand-dark font-extrabold text-xs rounded-xl flex items-center gap-2 hover:opacity-95 cursor-pointer"
+        >
+          <Sparkles className="w-4 h-4" /> {aiTesting ? 'Generating with NVIDIA GLM-5.2...' : 'Generate AI Catalog Description'}
+        </button>
+
+        {aiResult && (
+          <div className="p-4 rounded-2xl bg-brand-dark border border-brand-gold/30 text-xs space-y-2 animate-in fade-in duration-300">
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-brand-gold">{aiResult.seoTitle}</span>
+              <span className="text-[10px] text-emerald-400 font-mono font-bold">{aiResult.modelUsed}</span>
+            </div>
+            <p className="text-brand-pearl leading-relaxed">{aiResult.luxuryDescription}</p>
+            <p className="text-brand-muted text-[11px] border-t border-brand-border/60 pt-2">{aiResult.fabricDetails}</p>
+          </div>
+        )}
       </div>
 
       {/* Filter Tabs */}
