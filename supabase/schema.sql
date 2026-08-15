@@ -301,7 +301,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 11. ROW LEVEL SECURITY
+-- 11. ROW LEVEL SECURITY & IDEMPOTENT POLICIES
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.collections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -311,10 +311,23 @@ ALTER TABLE public.provider_products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Allow public read access to categories" ON public.categories;
 CREATE POLICY "Allow public read access to categories" ON public.categories FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Allow public read access to collections" ON public.collections;
 CREATE POLICY "Allow public read access to collections" ON public.collections FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Allow public read access to products" ON public.products;
 CREATE POLICY "Allow public read access to products" ON public.products FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Allow public read access to product_variants" ON public.product_variants;
 CREATE POLICY "Allow public read access to product_variants" ON public.product_variants FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Allow public read access to product_images" ON public.product_images;
 CREATE POLICY "Allow public read access to product_images" ON public.product_images FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Allow public insert for orders" ON public.orders;
 CREATE POLICY "Allow public insert for orders" ON public.orders FOR INSERT WITH CHECK (TRUE);
+
+DROP POLICY IF EXISTS "Allow public insert for order_items" ON public.order_items;
 CREATE POLICY "Allow public insert for order_items" ON public.order_items FOR INSERT WITH CHECK (TRUE);
