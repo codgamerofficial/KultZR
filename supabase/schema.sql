@@ -1,5 +1,5 @@
 -- KultZR Supabase PostgreSQL Database Schema
--- Execute in Supabase SQL Editor to provision tables and Row Level Security (RLS)
+-- Execute in Supabase SQL Editor to provision database tables and Row Level Security (RLS)
 
 CREATE TABLE public.profiles (
     id UUID PRIMARY KEY,
@@ -27,8 +27,8 @@ CREATE TABLE public.products (
     slug VARCHAR(255) NOT NULL,
     category_slug VARCHAR(255) NOT NULL,
     gender VARCHAR(50) NOT NULL,
-    price NUMERIC(10, 2) NOT NULL,
-    original_price NUMERIC(10, 2),
+    price NUMERIC NOT NULL,
+    original_price NUMERIC,
     description TEXT NOT NULL,
     story TEXT,
     fabric_details TEXT,
@@ -37,7 +37,7 @@ CREATE TABLE public.products (
     sizes TEXT,
     is_customizable BOOLEAN DEFAULT TRUE,
     is_featured BOOLEAN DEFAULT FALSE,
-    rating NUMERIC(3, 2) DEFAULT 4.90,
+    rating NUMERIC DEFAULT 4.90,
     review_count INTEGER DEFAULT 18,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -63,7 +63,7 @@ CREATE TABLE public.orders (
     customer_email VARCHAR(255) NOT NULL,
     customer_name VARCHAR(255) NOT NULL,
     shipping_address JSONB NOT NULL,
-    total_amount NUMERIC(10, 2) NOT NULL,
+    total_amount NUMERIC NOT NULL,
     currency VARCHAR(10) DEFAULT 'INR',
     payment_status VARCHAR(50) DEFAULT 'pending',
     order_status VARCHAR(50) DEFAULT 'processing',
@@ -81,7 +81,7 @@ CREATE TABLE public.order_items (
     quantity INTEGER DEFAULT 1 NOT NULL,
     size VARCHAR(50) NOT NULL,
     color VARCHAR(50) NOT NULL,
-    unit_price NUMERIC(10, 2) NOT NULL,
+    unit_price NUMERIC NOT NULL,
     customization_details JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -92,7 +92,7 @@ CREATE TABLE public.newsletter_subscribers (
     subscribed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Supabase RLS Policies
+-- PostgreSQL / Supabase Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.customizations ENABLE ROW LEVEL SECURITY;
