@@ -1,42 +1,68 @@
-# KultZR – Wear Your Story 🖤✨
-> Modern, zero-inventory luxury streetwear brand and bespoke 2D apparel studio built with Next.js 16, Tailwind CSS v4, Supabase, and Razorpay.
+# KultZR – Wear Your Story | Zero-Inventory Luxury Apparel Platform
+
+![KultZR Monogram Logo](public/brand/logo.svg)
+
+> **Wear Your Story. Own Your Culture.**  
+> An unapologetic, zero-inventory luxury streetwear brand and bespoke 2D customizer studio engineered on Next.js 16, Supabase PostgreSQL, Razorpay payments, and Qikink Print-on-Demand (POD) fulfillment.
 
 ---
 
-## 🌟 Executive Overview
+## 🌟 Key Features
 
-**KultZR** operates on a zero-inventory, print-on-demand model. Every piece is crafted on 240 GSM 100% organic combed cotton with eco-friendly digital printing only after a customer places an order.
+1. **Bespoke 2D Customizer Studio (`/customize`)**:
+   - Real-time typography rendering (*Montserrat, Inter, Playfair Display, Cinzel*).
+   - Custom graphic upload and vector emblem presets (*Quill & Thread, Phoenix Crest, Minimalist Sun, Heritage Knot*).
+   - Interactive placement toggle (*Front Chest, Back Center, Sleeve Accent*) with instant shareable custom design URL generator.
 
-- **Bespoke 2D Customizer Studio**: Real-time canvas preview for custom text, story emblems, typography font selection, placement controls, and image graphic uploads.
-- **Live Supabase Integration**: PostgreSQL cloud schema (`profiles`, `categories`, `products`, `customizations`, `orders`, `order_items`) with Row Level Security (RLS).
-- **Authenticated Payments**: Official Razorpay Checkout SDK integration supporting UPI (GPay/PhonePe/Paytm), Cards, and NetBanking.
-- **User Dashboard & Guest Tracking**: Real order history querying, profile updates, and guest parcel lookup by order reference.
-- **Merchant Admin Portal**: Atelier order status management queue (`/admin/orders`) for print fulfillment updates.
+2. **Zero-Inventory POD Fulfillment (`src/lib/podAdapter.ts`)**:
+   - Integrated **Qikink POD Provider Adapter** for 350+ products, 2,750+ SKUs, zero MOQ, COD support, and express delivery across 29,000+ Indian pincodes.
+   - Webhook trigger on Razorpay payment success sending print orders straight to Qikink.
+   - Pluggable architecture ready for **Printful / Printify** global fulfillment.
+
+3. **AI Product Curation Pipeline (`/api/ai/enrich`)**:
+   - Hugging Face Inference API / Open LLM integration generating SEO luxury titles, storytelling copy, and 240 GSM organic cotton fabric specifications from user designs.
+
+4. **Live Cloud Database (Supabase PostgreSQL)**:
+   - Live tables: `profiles`, `categories`, `products`, `product_provider`, `customizations`, `orders`, `order_items`, `newsletter_subscribers`.
+   - Row Level Security (RLS) policies protecting user data.
+
+5. **Razorpay Payment Gateway Integration**:
+   - Server-side Razorpay order generation (`/api/checkout`) and client-side popup SDK (`RazorpayModal.tsx`).
+   - Sandbox test key (`rzp_test_TQ7Cdpi6W4Balz`) with test mode guidance banner.
+
+6. **Authentication & Account Dashboard (`/account`)**:
+   - Supabase JWT authentication (`AuthModal.tsx` & `authContext.tsx`).
+   - Profile management and live user order history tracking.
+
+7. **Order Tracking & Atelier Merchant Portal**:
+   - `/track`: Guest real-time parcel tracking lookup.
+   - `/admin/orders`: Merchant atelier order queue with status updates (*Processing -> Printing -> Shipped -> Delivered*).
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack & Services
 
-- **Frontend Framework**: Next.js 16 (App Router) + React 19 + TypeScript
-- **Styling & Design System**: Tailwind CSS v4 (`@tailwindcss/postcss`) + Vanilla CSS glassmorphism
-- **Icons & Micro-Animations**: Lucide React + Canvas Confetti
-- **Database & Authentication**: Supabase PostgreSQL (`@supabase/supabase-js`)
-- **Payment Gateway**: Razorpay Node SDK & Client Popup Modal (`https://checkout.razorpay.com/v1/checkout.js`)
-- **Hosting & CI/CD**: Vercel zero-config (`vercel.json`)
+- **Frontend**: Next.js 16 (App Router, Turbopack, React 19), Tailwind CSS v4, Lucide Icons, Canvas Confetti.
+- **Backend / Database**: Supabase (PostgreSQL 15, Auth, Storage, Row Level Security).
+- **Payments**: Razorpay Node SDK & Client Popup Modal.
+- **POD Fulfillment**: Qikink Open REST API (`qikink.com`).
+- **AI Engine**: Hugging Face Inference API (`Mistral-7B-Instruct`).
+- **Hosting**: Vercel Serverless & CDN (`vercel.json`).
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Getting Started
 
-### 1. Clone & Install Dependencies
+### 1. Clone Repository & Install Dependencies
 ```bash
 git clone https://github.com/codgamerofficial/KultZR.git
 cd KultZR
 npm install
 ```
 
-### 2. Configure Environment Variables
-Create a `.env.local` file in the root directory:
+### 2. Environment Setup (`.env.local`)
+Create `.env.local` in the project root with the following keys:
+
 ```env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://thkztuyvpbwwwkppofuf.supabase.co
@@ -47,6 +73,14 @@ SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_TQ7Cdpi6W4Balz
 RAZORPAY_KEY_SECRET=4w6VDRwpcsW7NKo4001pabPw
 
+# Qikink Print-on-Demand (POD) API Configuration
+QIKINK_API_KEY=your-qikink-api-key
+QIKINK_API_SECRET=your-qikink-api-secret
+QIKINK_API_URL=https://api.qikink.com/v2
+
+# Hugging Face AI Catalog Curation Token (Optional)
+HUGGINGFACE_API_TOKEN=your-huggingface-api-token
+
 # Base Application URL
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_ENV=development
@@ -56,7 +90,7 @@ NEXT_PUBLIC_ENV=development
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) (or `http://localhost:3001` if port 3000 is occupied) in your browser.
 
 ### 4. Build for Production
 ```bash
@@ -66,73 +100,13 @@ npm start
 
 ---
 
-## 🗺️ Project Structure & Routes
+## 🔒 Legal & GST Registration
 
-```
-src/
-├── app/
-│   ├── page.tsx               # Homepage (Hero, Pillars, Featured Drops, Customizer Teaser)
-│   ├── shop/page.tsx          # Catalog Grid with Category Tabs & Sorting
-│   ├── products/[slug]/       # Product Detail Page with 240 GSM Fabric Specs
-│   ├── customize/page.tsx     # Full-Screen Bespoke 2D Design Studio
-│   ├── cart/page.tsx          # Shopping Bag Overview
-│   ├── checkout/page.tsx      # Multi-Step Address Form & Razorpay Trigger
-│   ├── account/page.tsx       # User Profile & Real Order History Dashboard
-│   ├── track/page.tsx         # Guest Real-Time Order Tracking Portal
-│   ├── admin/orders/page.tsx  # Merchant Order Management Queue
-│   ├── about/page.tsx         # About KultZR Philosophy
-│   ├── story/page.tsx         # Zero-Inventory Brand Manifesto
-│   ├── shipping/page.tsx      # Shipping & Delivery Timelines Policy
-│   ├── guarantee/page.tsx     # 30-Day Quality & Wash Guarantee
-│   ├── terms/page.tsx         # Terms of Service & GST Compliance
-│   ├── privacy/page.tsx       # Privacy Policy & GDPR Rights
-│   ├── sitemap.ts             # Dynamic XML Sitemap Generator
-│   ├── robots.ts              # Search Engine Crawler Config
-│   └── api/
-│       ├── checkout/route.ts  # Razorpay Server-Side Order Endpoint
-│       └── webhooks/pod/      # Print-on-Demand Fulfillment Webhook
-├── components/
-│   ├── Navbar.tsx             # Sticky Header with Cart Counter & Auth Badge
-│   ├── Footer.tsx             # Footer with GSTIN Details & Policy Links
-│   ├── ProductCard.tsx        # Catalog Card Component with Color Swatches
-│   ├── CustomizerStudio.tsx   # Live 2D Canvas Typography & Emblem Editor
-│   ├── CartDrawer.tsx         # Slide-Over Cart Drawer
-│   ├── RazorpayModal.tsx      # Razorpay Payment Gateway Popup Modal
-│   └── AuthModal.tsx          # Supabase Encrypted Registration & Login
-└── lib/
-    ├── authContext.tsx        # Supabase Authentication & Profile Context
-    ├── cartContext.tsx        # Shopping Cart & LocalStorage Context
-    ├── mockData.ts            # Seed Catalog & Brand Testimonials
-    ├── supabase.ts            # Supabase Client Initialization
-    └── types.ts               # TypeScript Interfaces
-```
+- **Brand Entity**: KultZR Apparel & Co.
+- **GSTIN Registration**: 27AAACK1234F1Z9
+- **Policy Pages**: `/about`, `/shipping`, `/guarantee`, `/terms`, `/privacy`
 
 ---
 
-## 🗄️ Database Provisioning
-
-Run [supabase/schema.sql](file:///d:/KultZR/supabase/schema.sql) in your Supabase SQL Editor to create database tables and Row Level Security policies:
-```sql
--- Tables: profiles, categories, products, customizations, orders, order_items, newsletter_subscribers
--- RLS policies enabled for public product reads and secure order inserts.
-```
-
-To seed initial sample products:
-```bash
-node scripts/seedProducts.js
-```
-
----
-
-## 🚢 Deployment to Vercel
-
-1. Push your repository to GitHub ([https://github.com/codgamerofficial/KultZR.git](https://github.com/codgamerofficial/KultZR.git)).
-2. Import the project into Vercel.
-3. Add environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`).
-4. Click **Deploy**. Vercel will automatically detect `vercel.json` and build all routes.
-
----
-
-## 📜 License & Compliance
-
-© 2026 KultZR – Wear Your Story. All rights reserved. Registered GST Entity (GSTIN: `27AAACK1234F1Z9`).
+## 📜 License
+© {new Date().getFullYear()} KultZR – Wear Your Story. All rights reserved.
