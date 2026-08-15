@@ -55,14 +55,14 @@ export default function Footer() {
           
           {/* Brand Info (4 cols) */}
           <div className="md:col-span-4 space-y-4">
-            <Link href="/" className="inline-block text-2xl font-black tracking-tight text-brand-pearl">
-              KULT<span className="text-brand-gold">ZR</span>
+            <Link href="/" className="inline-block">
+              <img src="/brand/logo-horizontal.svg" alt="KultZR Logo" className="h-10 w-auto object-contain" />
             </Link>
             <p className="text-xs text-brand-muted leading-relaxed max-w-sm">
               Wear Your Story. Modern, sustainable luxury apparel printed exclusively on-demand. Zero inventory, uncompromised quality.
             </p>
             <div className="pt-2 text-xs text-brand-gold font-bold">
-              GST Registered • GSTIN: 27AAACK1234F1Z9
+              GST Registered Entity • GSTIN: 27AAACK1234F1Z9
             </div>
           </div>
 

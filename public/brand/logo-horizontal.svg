@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5E080"/>
+      <stop offset="40%" stop-color="#D4AF37"/>
+      <stop offset="80%" stop-color="#AA7C11"/>
+      <stop offset="100%" stop-color="#E5C158"/>
+    </linearGradient>
+    <linearGradient id="silverGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#C0C0C0"/>
+      <stop offset="100%" stop-color="#9E9E9E"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(10, 10)">
+    <!-- Monogram Icon (Left) -->
+    <g transform="scale(0.28) translate(20, -10)">
+      <path fill="url(#silverGradH)" d="M 130 50 L 175 50 L 175 260 L 130 260 Z M 175 170 L 260 75 L 315 75 L 220 180 L 325 290 L 270 290 L 185 195 Z"/>
+      <path fill="url(#goldGradH)" d="M 160 155 L 300 155 L 330 110 L 265 110 L 350 10 L 320 10 L 225 110 L 160 110 Z M 160 290 L 380 60 L 340 60 L 130 290 Z M 280 155 L 390 290 L 340 290 L 240 170 Z"/>
+    </g>
+
+    <!-- Typography (Right) -->
+    <g transform="translate(130, 52)">
+      <text font-family="'Montserrat', 'Inter', sans-serif" font-size="38" font-weight="900" letter-spacing="6">
+        <tspan fill="url(#silverGradH)">KULT</tspan><tspan fill="url(#goldGradH)">ZR</tspan>
+      </text>
+      <text x="2" y="24" font-family="'Montserrat', 'Inter', sans-serif" font-size="10" font-weight="700" letter-spacing="4.5" fill="url(#goldGradH)" opacity="0.9">
+        WEAR YOUR STORY
+      </text>
+    </g>
+  </g>
+</svg>

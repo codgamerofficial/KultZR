@@ -1,189 +1,175 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 import CustomizerStudio from '@/components/CustomizerStudio';
 import { MOCK_PRODUCTS, MOCK_TESTIMONIALS } from '@/lib/mockData';
-import { Sparkles, ArrowRight, ShieldCheck, Leaf, HeartHandshake, Star, Flame } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Leaf, Flame, Heart, Star, Send } from 'lucide-react';
 
 export default function HomePage() {
-  const featuredProducts = MOCK_PRODUCTS.filter(p => p.is_featured || p.rating >= 4.9);
+  const featuredProducts = MOCK_PRODUCTS.filter(p => p.is_featured);
 
   return (
-    <div className="space-y-24 pb-16">
+    <div className="space-y-20 pb-16">
       
       {/* HERO SECTION */}
-      <section className="relative min-h-[85vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden pt-8">
-        {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-brand-gold/15 blur-[140px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-75 h-75 bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
+      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-12 pb-20">
+        
+        {/* Ambient Dark Glow Background */}
+        <div className="absolute inset-0 bg-radial from-amber-500/10 via-brand-dark/95 to-brand-dark pointer-events-none" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-brand-gold/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
 
-        <div className="relative max-w-5xl mx-auto text-center space-y-8 z-10">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 z-10">
           
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-brand-gold/40 text-brand-gold text-xs font-bold uppercase tracking-widest animate-glow shadow-lg shadow-amber-500/10">
-            <Sparkles className="w-4 h-4" /> Zero-Inventory Luxury Fashion
+          {/* Logo Insignia Badge */}
+          <div className="inline-flex items-center justify-center p-3 rounded-3xl bg-brand-card/60 backdrop-blur-md border border-brand-gold/30 shadow-2xl animate-in zoom-in duration-500">
+            <img src="/brand/logo.svg" alt="KultZR Monogram Logo" className="h-32 sm:h-44 w-auto object-contain drop-shadow-2xl" />
           </div>
 
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05]">
-            WEAR YOUR <br />
-            <span className="gold-gradient-text">STORY.</span>
-          </h1>
+          <div className="space-y-4 max-w-3xl mx-auto">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/30 text-xs font-bold uppercase tracking-widest">
+              <Sparkles className="w-4 h-4" /> Zero-Inventory Luxury Apparel
+            </span>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-brand-pearl leading-none">
+              WEAR YOUR <span className="bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 bg-clip-text text-transparent">STORY.</span>
+            </h1>
+            <p className="text-brand-muted text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+              Unapologetic, 240 GSM organic cotton heavyweight streetwear printed exclusively on-demand. Personalize your identity with our 2D Bespoke Studio.
+            </p>
+          </div>
 
-          <p className="max-w-2xl mx-auto text-base sm:text-xl text-brand-muted font-normal leading-relaxed">
-            KultZR is your personal canvas. Print your quotes, legacy, and identity on bespoke 240 GSM organic cotton apparel. Made on-demand with zero waste.
-          </p>
-
+          {/* Action CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
               href="/customize"
-              className="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-full shadow-xl shadow-amber-500/20 hover:scale-105 transition-transform flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-sm rounded-full shadow-xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Sparkles className="w-5 h-5" /> Launch Design Studio
+              <Sparkles className="w-4 h-4" /> Design in 2D Studio
             </Link>
-
             <Link
               href="/shop"
-              className="w-full sm:w-auto px-8 py-4 bg-brand-card/80 text-brand-pearl font-bold text-base rounded-full border border-brand-border hover:border-brand-gold transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-4 bg-brand-card/80 text-brand-pearl border border-brand-border hover:border-brand-gold font-bold text-sm rounded-full backdrop-blur-md transition-all flex items-center justify-center gap-2"
             >
-              Explore Shop <ArrowRight className="w-4 h-4" />
+              Explore Collection <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          {/* Social Proof */}
-          <div className="pt-8 flex flex-wrap items-center justify-center gap-8 text-xs text-brand-muted border-t border-brand-border/40 max-w-3xl mx-auto">
-            <div className="flex items-center gap-2">
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <span className="font-bold text-brand-pearl">4.9/5</span> Rating (500+ Stories Worn)
+          {/* Key Metrics Bar */}
+          <div className="pt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-left">
+            <div className="glass-panel p-4 rounded-2xl border border-brand-border">
+              <span className="text-2xl font-black text-brand-gold">240 GSM</span>
+              <p className="text-xs text-brand-muted mt-0.5">Heavyweight Organic Cotton</p>
             </div>
-            <div className="flex items-center gap-2">
-              <Leaf className="w-4 h-4 text-emerald-400" />
-              <span>100% Zero-Waste Production</span>
+            <div className="glass-panel p-4 rounded-2xl border border-brand-border">
+              <span className="text-2xl font-black text-brand-gold">0% Waste</span>
+              <p className="text-xs text-brand-muted mt-0.5">On-Demand Zero Inventory</p>
             </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-brand-gold" />
-              <span>Free Shipping Across India</span>
+            <div className="glass-panel p-4 rounded-2xl border border-brand-border">
+              <span className="text-2xl font-black text-brand-gold">3-5 Days</span>
+              <p className="text-xs text-brand-muted mt-0.5">Express Delivery Across India</p>
+            </div>
+            <div className="glass-panel p-4 rounded-2xl border border-brand-border">
+              <span className="text-2xl font-black text-brand-gold">4.9 / 5.0</span>
+              <p className="text-xs text-brand-muted mt-0.5">Customer Quality Rating</p>
             </div>
           </div>
 
-        </div>
-      </section>
-
-      {/* BRAND VALUES SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="glass-panel p-8 rounded-3xl border border-brand-border/80 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 text-brand-gold flex items-center justify-center font-bold">
-              <Leaf className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-bold text-brand-pearl">Zero Inventory Model</h3>
-            <p className="text-sm text-brand-muted leading-relaxed">
-              Fast fashion causes millions of unsold garments to go to waste. KultZR only prints after you order—protecting the planet while honoring your individuality.
-            </p>
-          </div>
-
-          <div className="glass-panel p-8 rounded-3xl border border-brand-border/80 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 text-brand-gold flex items-center justify-center font-bold">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-bold text-brand-pearl">Bespoke Customization</h3>
-            <p className="text-sm text-brand-muted leading-relaxed">
-              Use our live 2D studio to print your favorite quotes, family mantras, or original art in high-density eco-inks or 3D thread embroidery.
-            </p>
-          </div>
-
-          <div className="glass-panel p-8 rounded-3xl border border-brand-border/80 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 text-brand-gold flex items-center justify-center font-bold">
-              <HeartHandshake className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-bold text-brand-pearl">240 GSM Luxury Organic Cotton</h3>
-            <p className="text-sm text-brand-muted leading-relaxed">
-              Crafted from combed organic cotton with pre-shrunk bio-wash. Built to feel heavy, structured, and luxurious on your skin for years.
-            </p>
-          </div>
         </div>
       </section>
 
       {/* FEATURED DROPS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-brand-border pb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 border-b border-brand-border pb-4">
           <div>
-            <div className="flex items-center gap-2 text-brand-gold text-xs font-extrabold uppercase tracking-widest">
-              <Flame className="w-4 h-4 text-amber-400" /> Featured Drops
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-pearl mt-1">
-              Curated Canvas Apparel
-            </h2>
+            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+              <Flame className="w-4 h-4 text-amber-500" /> Limited Atelier Drops
+            </span>
+            <h2 className="text-3xl font-extrabold text-brand-pearl mt-1">Featured Bespoke Pieces</h2>
           </div>
-          <Link href="/shop" className="text-sm font-bold text-brand-gold hover:underline flex items-center gap-1">
-            View All Products ({MOCK_PRODUCTS.length}) &rarr;
+          <Link href="/shop" className="text-xs font-bold text-brand-gold hover:underline flex items-center gap-1">
+            View All Drops <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      {/* INTERACTIVE CUSTOMIZER TEASER STUDIO */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="px-3 py-1 rounded-full bg-brand-gold/20 text-brand-gold text-xs font-extrabold uppercase tracking-widest">
-            Try It Now
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-black text-brand-pearl">
-            Design Your Piece in Real-Time
-          </h2>
-          <p className="text-sm text-brand-muted">
-            Type your mantra, pick your font, select your garment color, and preview it live below.
-          </p>
-        </div>
-
+      {/* EMBEDDED BESPOKE STUDIO TEASER */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <CustomizerStudio />
       </section>
 
-      {/* USER STORIES & UGC GALLERY */}
+      {/* BRAND VALUES / ZERO INVENTORY PROMISE */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="glass-panel p-8 sm:p-12 rounded-3xl border border-brand-gold/30 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
+              <Leaf className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-brand-pearl">Zero-Inventory Fashion</h3>
+            <p className="text-xs text-brand-muted leading-relaxed">
+              Fast fashion produces 92 million tons of textile landfill waste per year. KultZR prints every garment specifically for you upon purchase.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-brand-pearl">Uncompromised Quality</h3>
+            <p className="text-xs text-brand-muted leading-relaxed">
+              We never compromise. 100% combed organic cotton, double-stitched seams, high-density OEKO-TEX eco-inks, and pre-shrunk fabric weight.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-brand-pearl">Empowered Expression</h3>
+            <p className="text-xs text-brand-muted leading-relaxed">
+              Your attire should make a statement. Add your quote, name, or story emblem to create a piece that is 100% unique to you.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* UGC TESTIMONIALS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-brand-gold text-xs font-bold uppercase tracking-widest">#WearYourStory</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-pearl">
-            Worn by Visionaries & Storytellers
-          </h2>
-          <p className="text-xs text-brand-muted">
-            Real customers wearing their personal legacy and custom designs.
-          </p>
+        <div className="text-center space-y-2 max-w-xl mx-auto">
+          <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">#WearYourStory Community</span>
+          <h2 className="text-3xl font-extrabold text-brand-pearl">Real Customer Stories</h2>
+          <p className="text-xs text-brand-muted">See how creators, founders, and artists wear their KultZR custom pieces.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {MOCK_TESTIMONIALS.map(item => (
-            <div key={item.id} className="glass-card p-6 rounded-3xl border border-brand-border space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex text-amber-400">
-                  {[...Array(item.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {MOCK_TESTIMONIALS.map(story => (
+            <div key={story.id} className="glass-panel p-6 rounded-2xl border border-brand-border space-y-4">
+              <div className="flex items-center gap-3">
+                <img src={story.avatar} alt={story.name} className="w-10 h-10 rounded-full object-cover border border-brand-gold/40" />
+                <div>
+                  <h4 className="font-bold text-xs text-brand-pearl">{story.name}</h4>
+                  <p className="text-[11px] text-brand-muted">{story.role}</p>
                 </div>
-                <p className="text-sm text-brand-pearl italic leading-relaxed">
-                  &quot;{item.text}&quot;
-                </p>
               </div>
 
-              <div className="flex items-center gap-3 pt-4 border-t border-brand-border/40">
-                <div className="w-10 h-10 rounded-full overflow-hidden relative bg-brand-dark">
-                  <Image src={item.avatar} alt={item.name} fill className="object-cover" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm text-brand-pearl">{item.name}</h4>
-                  <p className="text-xs text-brand-muted">{item.role}</p>
-                </div>
-                <span className="ml-auto text-[10px] font-bold text-brand-gold bg-brand-gold/10 px-2 py-1 rounded-md">
-                  {item.storyTag}
-                </span>
+              <div className="flex text-brand-gold gap-0.5">
+                {[...Array(story.rating || 5)].map((_, i) => (
+                  <Star key={i} className="w-3.5 h-3.5 fill-brand-gold" />
+                ))}
+              </div>
+
+              <p className="text-xs text-brand-pearl italic">&quot;{story.text}&quot;</p>
+              
+              <div className="pt-2 border-t border-brand-border/60 text-[10px] text-brand-gold font-semibold">
+                Custom Piece: &quot;{story.storyTag}&quot;
               </div>
             </div>
           ))}
@@ -191,23 +177,30 @@ export default function HomePage() {
       </section>
 
       {/* NEWSLETTER BANNER */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="glass-panel p-10 sm:p-14 rounded-3xl border border-brand-gold/40 text-center space-y-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/10 blur-3xl pointer-events-none" />
-          <h2 className="text-3xl sm:text-5xl font-black text-brand-pearl">
-            Ready to Wear Your Story?
-          </h2>
-          <p className="text-sm text-brand-muted max-w-xl mx-auto leading-relaxed">
-            Join the KultZR inner circle. Get priority access to limited drops, custom embroidery releases, and ₹300 off your first bespoke order.
-          </p>
-          <div className="pt-2 flex justify-center">
-            <Link
-              href="/customize"
-              className="px-8 py-4 bg-linear-to-r from-amber-400 to-brand-gold text-brand-dark font-extrabold text-base rounded-full shadow-xl shadow-amber-500/20 hover:scale-105 transition-transform"
-            >
-              Start Customizing Now &rarr;
-            </Link>
+      <section id="newsletter" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative glass-panel p-8 sm:p-12 rounded-3xl border border-brand-gold/40 text-center space-y-6 overflow-hidden">
+          <div className="space-y-2 max-w-xl mx-auto">
+            <span className="text-xs font-bold uppercase tracking-widest text-brand-gold">Join The KultZR Circle</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-pearl">Unlock 15% Off Your First Bespoke Piece</h2>
+            <p className="text-xs text-brand-muted">Subscribe for exclusive story drop access, custom emblem unlocks, and secret discounts.</p>
           </div>
+
+          <form onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing to KultZR!'); }} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input
+              type="email"
+              required
+              placeholder="Enter your email address..."
+              className="w-full bg-brand-dark border border-brand-border rounded-full px-5 py-3 text-xs text-brand-pearl focus:outline-none focus:border-brand-gold"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-brand-gold text-brand-dark font-extrabold text-xs rounded-full hover:bg-amber-400 transition-colors shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              Subscribe <Send className="w-3.5 h-3.5" />
+            </button>
+          </form>
+
+          <p className="text-[10px] text-brand-muted">No spam. Unsubscribe at any time with 1 click.</p>
         </div>
       </section>
 

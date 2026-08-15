@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   title: 'KultZR – Wear Your Story | Zero-Inventory Luxury Fashion',
   description: 'Unapologetic, high-density 240 GSM organic cotton streetwear and bespoke 2D apparel studio built on zero-waste on-demand printing.',
   keywords: ['KultZR', 'Wear Your Story', 'Luxury Streetwear', 'Zero Inventory', 'Print on Demand', 'Custom Apparel India'],
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/brand/icon.svg',
+  },
 };
 
 export default function RootLayout({

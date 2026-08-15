@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/lib/cartContext';
 import { useAuth } from '@/lib/authContext';
 import AuthModal from './AuthModal';
@@ -21,12 +22,12 @@ export default function Navbar() {
       <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-brand-dark/85 border-b border-brand-border/60 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-2xl sm:text-3xl font-black tracking-tight text-brand-pearl">
-              KULT<span className="text-brand-gold group-hover:text-amber-400 transition-colors">ZR</span>
-            </span>
-            <span className="hidden sm:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/30">
+          {/* Logo with official vector monogram */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="h-10 w-auto relative flex items-center">
+              <img src="/brand/logo-horizontal.svg" alt="KultZR Logo" className="h-9 w-auto object-contain hover:scale-[1.02] transition-transform" />
+            </div>
+            <span className="hidden lg:inline-block text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/30">
               Zero Inventory
             </span>
           </Link>

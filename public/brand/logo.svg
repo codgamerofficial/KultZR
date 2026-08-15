@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <!-- Metallic Gold Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5E080"/>
+      <stop offset="35%" stop-color="#D4AF37"/>
+      <stop offset="70%" stop-color="#AA7C11"/>
+      <stop offset="100%" stop-color="#E5C158"/>
+    </linearGradient>
+
+    <!-- Metallic Silver Gradient -->
+    <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="40%" stop-color="#C0C0C0"/>
+      <stop offset="80%" stop-color="#808080"/>
+      <stop offset="100%" stop-color="#E0E0E0"/>
+    </linearGradient>
+
+    <!-- Dark Glow Effect -->
+    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="600" fill="#0A0A0C"/>
+
+  <g transform="translate(0, -10)">
+    <!-- Monogram K (Silver) -->
+    <path fill="url(#silverGrad)" d="M 330 110 L 375 110 L 375 320 L 330 320 Z M 375 230 L 460 135 L 515 135 L 420 240 L 525 350 L 470 350 L 385 255 Z"/>
+
+    <!-- Monogram ZR Interlaced (Gold) -->
+    <path fill="url(#goldGrad)" filter="url(#goldGlow)" d="M 360 215 L 500 215 L 530 170 L 465 170 L 550 70 L 520 70 L 425 170 L 360 170 Z M 360 350 L 580 120 L 540 120 L 330 350 Z M 480 215 L 590 350 L 540 350 L 440 230 Z"/>
+
+    <!-- Typography: KULTZR -->
+    <text x="400" y="440" font-family="'Montserrat', 'Inter', sans-serif" font-size="52" font-weight="900" letter-spacing="18" text-anchor="middle">
+      <tspan fill="url(#silverGrad)">KULT</tspan><tspan fill="url(#goldGrad)">ZR</tspan>
+    </text>
+
+    <!-- Subtitle: WEAR YOUR STORY -->
+    <g transform="translate(400, 485)">
+      <line x1="-240" y1="-5" x2="-140" y2="-5" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.8"/>
+      <text font-family="'Montserrat', 'Inter', sans-serif" font-size="16" font-weight="700" letter-spacing="10" fill="url(#goldGrad)" text-anchor="middle">
+        WEAR YOUR STORY
+      </text>
+      <line x1="140" y1="-5" x2="240" y2="-5" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.8"/>
+    </g>
+
+    <!-- Diamond Star Accent -->
+    <polygon points="400,515 404,523 412,527 404,531 400,539 396,531 388,527 396,523" fill="url(#goldGrad)"/>
+  </g>
+</svg>
