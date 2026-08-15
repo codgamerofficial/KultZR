@@ -4,6 +4,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
+import PromoBannerModal from '@/components/PromoBannerModal';
 import { CartProvider } from '@/lib/cartContext';
 import { AuthProvider } from '@/lib/authContext';
 
@@ -40,6 +41,7 @@ export default function RootLayout({
           <CartProvider>
             <Navbar />
             <CartDrawer />
+            <PromoBannerModal />
             <main className="flex-1">
               {children}
             </main>

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/lib/cartContext';
 import { MOCK_PRODUCTS } from '@/lib/mockData';
 import { Product, ColorOption } from '@/lib/types';
-import { Sparkles, ShoppingBag, Type, Palette, Layout, ShieldCheck, Check, Upload, Image as ImageIcon, Share2 } from 'lucide-react';
+import { Sparkles, ShoppingBag, Type, Palette, Layout, ShieldCheck, Check, Upload, Image as ImageIcon, Share2, Compass, Crown, Sun } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const FONTS = [
@@ -13,11 +13,13 @@ const FONTS = [
   { name: 'Playfair Display', value: 'Georgia, serif' },
   { name: 'Bebas Neue', value: 'Impact, sans-serif' },
   { name: 'Courier Code', value: 'monospace' },
+  { name: 'Cinzel Decorative', value: "'Cinzel', Georgia, serif" },
 ];
 
 const TEXT_COLORS = [
   { name: 'Pearl White', hex: '#FAFAFA' },
   { name: 'Imperial Gold', hex: '#D4AF37' },
+  { name: 'Metallic Silver', hex: '#C0C0C0' },
   { name: 'Amber Yellow', hex: '#FFC107' },
   { name: 'Crimson Red', hex: '#E54D42' },
   { name: 'Obsidian Black', hex: '#0A0A0C' },
@@ -29,14 +31,19 @@ const STORY_PRESETS = [
   "Code & Canvas.",
   "Culture Over Everything.",
   "Crafted in Silence, Speaks in Thunder.",
+  "Zero Inventory. Infinite Identity.",
 ];
 
 const EMBLEM_PRESETS = [
-  { name: 'None', icon: null },
-  { name: 'Quill & Thread', icon: '🖋️' },
-  { name: 'Phoenix Crest', icon: '🦅' },
-  { name: 'Minimalist Sun', icon: '☀️' },
-  { name: 'Heritage Knot', icon: '⚜️' },
+  { name: 'None', icon: null, svgPath: null },
+  { name: 'KR Monogram', icon: '✨', svgPath: '/brand/icon.svg' },
+  { name: 'Quill & Thread', icon: '🖋️', svgPath: null },
+  { name: 'Phoenix Crest', icon: '🦅', svgPath: null },
+  { name: 'Minimalist Sun', icon: '☀️', svgPath: null },
+  { name: 'Heritage Knot', icon: '⚜️', svgPath: null },
+  { name: 'Astral Compass', icon: '🧭', svgPath: null },
+  { name: 'Urban Crown', icon: '👑', svgPath: null },
+  { name: 'Cyber Lotus', icon: '🪷', svgPath: null },
 ];
 
 export default function CustomizerStudio({ initialProduct }: { initialProduct?: Product }) {
@@ -50,7 +57,7 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
   const [customText, setCustomText] = useState<string>('WEAR YOUR STORY');
   const [selectedFont, setSelectedFont] = useState<string>(FONTS[0].name);
   const [selectedTextColor, setSelectedTextColor] = useState<string>('#FAFAFA');
-  const [selectedEmblem, setSelectedEmblem] = useState<string>('None');
+  const [selectedEmblem, setSelectedEmblem] = useState<string>('KR Monogram');
   const [uploadedGraphic, setUploadedGraphic] = useState<string | null>(null);
   const [placement, setPlacement] = useState<'front_center' | 'back_center' | 'chest_pocket'>('front_center');
   const [added, setAdded] = useState(false);
@@ -60,18 +67,15 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onload = () => {
         setUploadedGraphic(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleShareDesign = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const activeFontObj = FONTS.find(f => f.name === selectedFont) || FONTS[0];
+  const activeEmblemObj = EMBLEM_PRESETS.find(e => e.name === selectedEmblem);
 
   const handleAddToCart = () => {
     addToCart(
@@ -83,283 +87,286 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
         font_family: selectedFont,
         text_color: selectedTextColor,
         garment_color: selectedGarmentColor.name,
+        graphic_url: uploadedGraphic || activeEmblemObj?.svgPath || undefined,
         placement: placement,
-        graphic_url: uploadedGraphic || undefined,
-      }
+      },
+      1
     );
 
     setAdded(true);
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
     setTimeout(() => setAdded(false), 2500);
   };
 
-  const emblemObj = EMBLEM_PRESETS.find(e => e.name === selectedEmblem);
+  const handleShareDesign = () => {
+    const url = `${window.location.origin}/customize?product=${selectedProduct.slug}&text=${encodeURIComponent(customText)}&font=${encodeURIComponent(selectedFont)}&color=${encodeURIComponent(selectedGarmentColor.name)}&emblem=${encodeURIComponent(selectedEmblem)}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-brand-gold/30 shadow-2xl space-y-8">
       
-      {/* LEFT CANVAS PREVIEW (7 Cols) */}
-      <div className="lg:col-span-7 space-y-4">
-        <div className="relative aspect-square w-full rounded-3xl overflow-hidden glass-panel border border-brand-gold/30 flex items-center justify-center p-8 shadow-2xl">
-          
-          {/* Background Mockup Image */}
-          <div 
-            className="absolute inset-0 transition-colors duration-500" 
-            style={{ backgroundColor: selectedGarmentColor.hex === '#FAFAFA' ? '#F4F4F6' : selectedGarmentColor.hex }}
-          >
-            <Image
-              src={selectedProduct.images[0]}
-              alt={selectedProduct.title}
-              fill
-              className="object-contain opacity-75 mix-blend-multiply"
-            />
-          </div>
-
-          {/* Live Rendered Custom Text Layer */}
-          <div 
-            className={`absolute transition-all duration-300 pointer-events-none text-center px-6 max-w-[80%] ${
-              placement === 'front_center' ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' :
-              placement === 'back_center' ? 'top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2' :
-              'top-[32%] left-[38%] -translate-x-1/2'
-            }`}
-          >
-            {/* Custom Graphic or Emblem */}
-            {uploadedGraphic ? (
-              <div className="w-16 h-16 relative mx-auto mb-2 opacity-90">
-                <img src={uploadedGraphic} alt="Custom Graphic" className="w-full h-full object-contain" />
-              </div>
-            ) : emblemObj?.icon ? (
-              <div className="text-3xl mb-1 drop-shadow-md">{emblemObj.icon}</div>
-            ) : null}
-
-            <p
-              className="tracking-widest font-extrabold uppercase drop-shadow-md select-none transition-all"
-              style={{
-                color: selectedTextColor,
-                fontSize: placement === 'chest_pocket' ? '1rem' : '1.75rem',
-                fontFamily: selectedFont === 'Courier Code' ? 'monospace' : selectedFont === 'Playfair Display' ? 'Georgia, serif' : 'var(--font-inter), sans-serif',
-                textShadow: selectedTextColor === '#0A0A0C' ? '0 1px 2px rgba(255,255,255,0.4)' : '0 2px 8px rgba(0,0,0,0.6)'
-              }}
-            >
-              {customText || 'YOUR CUSTOM STORY'}
-            </p>
-            <div className="w-12 h-0.5 bg-brand-gold mx-auto mt-2 opacity-80" />
-            <span className="text-[10px] tracking-widest text-brand-gold font-bold uppercase block mt-1">
-              KultZR Bespoke
-            </span>
-          </div>
-
-          {/* Canvas Watermark Bar */}
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-brand-pearl bg-brand-dark/80 backdrop-blur-md px-4 py-2 rounded-xl border border-brand-border">
-            <span className="flex items-center gap-1.5 text-brand-gold font-bold">
-              <Sparkles className="w-4 h-4" /> Live 2D Mockup Canvas
-            </span>
-            <button 
-              onClick={handleShareDesign}
-              className="text-brand-muted hover:text-brand-gold text-[11px] font-semibold flex items-center gap-1 transition-colors"
-            >
-              <Share2 className="w-3.5 h-3.5" /> {copied ? 'Link Copied!' : 'Share Design'}
-            </button>
-          </div>
-
-        </div>
-
-        {/* Garment Selector Tabs */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {MOCK_PRODUCTS.slice(0, 4).map(prod => (
-            <button
-              key={prod.id}
-              onClick={() => {
-                setSelectedProduct(prod);
-                setSelectedGarmentColor(prod.colors[0]);
-              }}
-              className={`p-3 rounded-xl text-left border transition-all ${
-                selectedProduct.id === prod.id 
-                  ? 'border-brand-gold bg-brand-gold/10 text-brand-pearl font-bold' 
-                  : 'border-brand-border bg-brand-card/40 text-brand-muted hover:border-brand-pearl/40'
-              }`}
-            >
-              <p className="text-xs font-semibold line-clamp-1">{prod.title}</p>
-              <p className="text-[11px] text-brand-gold mt-1">₹{prod.price}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* RIGHT CONTROLS PANEL (5 Cols) */}
-      <div className="lg:col-span-5 glass-panel p-6 sm:p-8 rounded-3xl border border-brand-border space-y-6">
+      {/* Studio Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-brand-border pb-6">
         <div>
-          <div className="flex items-center gap-2 text-brand-gold font-bold text-xs uppercase tracking-widest">
-            <Sparkles className="w-4 h-4" /> KultZR Bespoke Studio
-          </div>
-          <h2 className="text-2xl font-bold text-brand-pearl mt-1">Customize {selectedProduct.title}</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4" /> 2D Atelier Bespoke Studio
+          </span>
+          <h2 className="text-3xl font-black text-brand-pearl mt-1">Design Your Personal Identity Piece</h2>
           <p className="text-xs text-brand-muted mt-1">
-            Express your story with custom typography on luxury 240 GSM organic cotton.
+            Zero-waste on-demand printing. Choose your emblem, statement text, typography, and placement.
           </p>
         </div>
 
-        {/* Control 1: Story Text Input & Presets */}
-        <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl flex items-center gap-2">
-            <Type className="w-4 h-4 text-brand-gold" /> Custom Story Text
-          </label>
-          <input
-            type="text"
-            maxLength={35}
-            value={customText}
-            onChange={(e) => setCustomText(e.target.value)}
-            placeholder="Type your quote or name..."
-            className="w-full bg-brand-dark border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-pearl font-semibold focus:outline-none focus:border-brand-gold"
-          />
-          <div className="flex items-center justify-between text-[11px] text-brand-muted">
-            <span>Max 35 characters</span>
-            <span>{35 - customText.length} left</span>
+        <button
+          onClick={handleShareDesign}
+          className="px-4 py-2.5 rounded-full bg-brand-dark border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 text-xs font-bold flex items-center gap-2 shrink-0 transition-all cursor-pointer"
+        >
+          <Share2 className="w-4 h-4" />
+          <span>{copied ? 'Design URL Copied!' : 'Share Custom Design'}</span>
+        </button>
+      </div>
+
+      {/* Main Interactive Studio Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* LEFT COLUMN: Garment Mockup Live 2D Canvas (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col items-center justify-center p-6 sm:p-10 rounded-3xl bg-brand-dark/90 border border-brand-border relative min-h-[460px] overflow-hidden group">
+          
+          {/* Subtle Ambient Studio Light */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Placement Badge */}
+          <span className="absolute top-4 left-4 text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full bg-brand-card/80 text-brand-gold border border-brand-gold/30">
+            Preview: {placement.replace('_', ' ')}
+          </span>
+
+          {/* Garment Image Mockup */}
+          <div className="relative w-72 h-80 sm:w-88 sm:h-96 flex items-center justify-center transition-transform duration-300 group-hover:scale-[1.02]">
+            <Image
+              src={selectedProduct.images[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800'}
+              alt={selectedProduct.title}
+              fill
+              className="object-contain drop-shadow-2xl"
+              priority
+            />
+
+            {/* LIVE 2D OVERLAY CANVAS PRINT AREA */}
+            <div
+              className={`absolute flex flex-col items-center justify-center text-center p-3 pointer-events-none transition-all duration-300 ${
+                placement === 'front_center'
+                  ? 'top-[28%] w-[60%]'
+                  : placement === 'back_center'
+                  ? 'top-[26%] w-[65%]'
+                  : 'top-[24%] left-[22%] w-[35%]'
+              }`}
+            >
+              {/* Custom Graphic Upload or Vector SVG Emblem */}
+              {uploadedGraphic ? (
+                <img src={uploadedGraphic} alt="Custom Graphic" className="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-2 drop-shadow-md" />
+              ) : activeEmblemObj?.svgPath ? (
+                <img src={activeEmblemObj.svgPath} alt="KR Emblem" className="w-14 h-14 sm:w-18 sm:h-18 object-contain mb-2 drop-shadow-lg" />
+              ) : activeEmblemObj?.icon ? (
+                <span className="text-2xl sm:text-3xl mb-1 filter drop-shadow-md">{activeEmblemObj.icon}</span>
+              ) : null}
+
+              {/* Typography Statement Text */}
+              {customText && (
+                <p
+                  style={{
+                    fontFamily: activeFontObj.value,
+                    color: selectedTextColor,
+                    textShadow: '0 2px 8px rgba(0,0,0,0.85)'
+                  }}
+                  className="text-base sm:text-lg md:text-xl font-extrabold tracking-wide leading-tight break-words max-w-full drop-shadow-xl uppercase"
+                >
+                  {customText}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Quick Presets */}
-          <div className="pt-2">
-            <p className="text-[11px] text-brand-muted mb-2">Or select a story preset:</p>
-            <div className="flex flex-wrap gap-1.5">
+          {/* Garment Color Swatches under mockup */}
+          <div className="mt-4 flex items-center gap-3 z-10">
+            <span className="text-xs text-brand-muted font-bold">Fabric Color:</span>
+            {selectedProduct.colors.map(color => (
+              <button
+                key={color.name}
+                onClick={() => setSelectedGarmentColor(color)}
+                style={{ backgroundColor: color.hex }}
+                className={`w-6 h-6 rounded-full border-2 transition-transform cursor-pointer ${
+                  selectedGarmentColor.name === color.name ? 'border-brand-gold scale-125 shadow-lg shadow-amber-500/30' : 'border-brand-border hover:scale-110'
+                }`}
+                title={color.name}
+              />
+            ))}
+          </div>
+
+        </div>
+
+        {/* RIGHT COLUMN: Customization Controls (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          
+          {/* Base Product Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+              <Layout className="w-3.5 h-3.5" /> Select Atelier Silhouette
+            </label>
+            <select
+              value={selectedProduct.id}
+              onChange={(e) => {
+                const prod = MOCK_PRODUCTS.find(p => p.id === e.target.value);
+                if (prod) {
+                  setSelectedProduct(prod);
+                  setSelectedGarmentColor(prod.colors[0]);
+                  setSelectedSize(prod.sizes[0] || 'M');
+                }
+              }}
+              className="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-xs text-brand-pearl focus:outline-none focus:border-brand-gold"
+            >
+              {MOCK_PRODUCTS.map(p => (
+                <option key={p.id} value={p.id}>{p.title} — ₹{p.price.toLocaleString('en-IN')}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Statement Quote Text Input */}
+          <div className="space-y-2">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+              <Type className="w-3.5 h-3.5" /> Statement Quote / Name
+            </label>
+            <input
+              type="text"
+              maxLength={45}
+              value={customText}
+              onChange={(e) => setCustomText(e.target.value)}
+              placeholder="e.g. WEAR YOUR STORY"
+              className="w-full bg-brand-dark border border-brand-border rounded-xl p-3 text-xs text-brand-pearl focus:outline-none focus:border-brand-gold uppercase font-bold"
+            />
+
+            {/* Quick Story Statement Presets */}
+            <div className="flex flex-wrap gap-1.5 pt-1">
               {STORY_PRESETS.map(preset => (
                 <button
                   key={preset}
                   onClick={() => setCustomText(preset)}
-                  className="px-2.5 py-1 rounded-lg bg-brand-card/80 border border-brand-border text-[11px] text-brand-pearl hover:border-brand-gold hover:text-brand-gold transition-colors"
+                  className="px-2.5 py-1 rounded-full bg-brand-card/60 border border-brand-border hover:border-brand-gold text-[10px] text-brand-muted hover:text-brand-pearl transition-all cursor-pointer"
                 >
-                  &quot;{preset}&quot;
+                  {preset}
                 </button>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Control 2: Story Emblems & Upload */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center text-xs">
-            <label className="font-bold uppercase tracking-wider text-brand-pearl flex items-center gap-1.5">
-              <ImageIcon className="w-3.5 h-3.5 text-brand-gold" /> Story Emblem / Graphic
-            </label>
-            <label className="text-brand-gold hover:underline cursor-pointer flex items-center gap-1 font-semibold">
-              <Upload className="w-3.5 h-3.5" /> Upload Custom Graphic
-              <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-            </label>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {EMBLEM_PRESETS.map(emblem => (
-              <button
-                key={emblem.name}
-                onClick={() => {
-                  setSelectedEmblem(emblem.name);
-                  setUploadedGraphic(null);
-                }}
-                className={`py-2 px-2 rounded-xl border text-[11px] text-center flex items-center justify-center gap-1 transition-all ${
-                  selectedEmblem === emblem.name && !uploadedGraphic
-                    ? 'border-brand-gold bg-brand-gold/10 text-brand-gold font-bold'
-                    : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
-                }`}
-              >
-                {emblem.icon && <span>{emblem.icon}</span>}
-                <span className="truncate">{emblem.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Control 3: Typography Style */}
-        <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl">
-            Typography Style
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            {FONTS.map(font => (
-              <button
-                key={font.name}
-                onClick={() => setSelectedFont(font.name)}
-                className={`py-2 px-3 rounded-xl border text-xs text-center transition-all ${
-                  selectedFont === font.name
-                    ? 'border-brand-gold bg-brand-gold/10 text-brand-gold font-bold'
-                    : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
-                }`}
-              >
-                {font.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Control 4: Text & Garment Colors */}
-        <div className="grid grid-cols-2 gap-4">
+          {/* Vector Emblem Presets (Expanded) */}
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl flex items-center gap-1.5">
-              <Palette className="w-3.5 h-3.5 text-brand-gold" /> Text Color
+            <label className="text-xs font-extrabold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Vector Story Emblems
             </label>
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-3 gap-2">
+              {EMBLEM_PRESETS.map(emb => (
+                <button
+                  key={emb.name}
+                  onClick={() => {
+                    setSelectedEmblem(emb.name);
+                    setUploadedGraphic(null);
+                  }}
+                  className={`p-2.5 rounded-xl border text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    selectedEmblem === emb.name && !uploadedGraphic
+                      ? 'border-brand-gold bg-brand-gold/15 text-brand-gold shadow-md shadow-amber-500/10'
+                      : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
+                  }`}
+                >
+                  {emb.svgPath ? (
+                    <img src={emb.svgPath} alt="KR" className="w-4 h-4 object-contain" />
+                  ) : emb.icon ? (
+                    <span>{emb.icon}</span>
+                  ) : null}
+                  <span className="truncate">{emb.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Graphic File Upload */}
+          <div className="space-y-2">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+              <Upload className="w-3.5 h-3.5" /> Upload Custom Graphic (PNG / SVG)
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/png, image/svg+xml, image/jpeg"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="custom-graphic-upload"
+              />
+              <label
+                htmlFor="custom-graphic-upload"
+                className="w-full p-3 rounded-xl border border-dashed border-brand-border bg-brand-dark hover:border-brand-gold text-xs text-brand-muted hover:text-brand-pearl flex items-center justify-center gap-2 cursor-pointer transition-colors"
+              >
+                <ImageIcon className="w-4 h-4 text-brand-gold" />
+                <span>{uploadedGraphic ? 'Replace Uploaded Graphic' : 'Upload Graphic Vector'}</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Font Typography Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+              <Type className="w-3.5 h-3.5" /> Typography Font Style
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {FONTS.map(font => (
+                <button
+                  key={font.name}
+                  onClick={() => setSelectedFont(font.name)}
+                  className={`p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                    selectedFont === font.name
+                      ? 'border-brand-gold bg-brand-gold/10 text-brand-gold'
+                      : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
+                  }`}
+                >
+                  {font.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Text Color Swatches */}
+          <div className="space-y-2">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-brand-gold flex items-center gap-1.5">
+              <Palette className="w-3.5 h-3.5" /> Print Ink Color
+            </label>
+            <div className="flex items-center gap-3">
               {TEXT_COLORS.map(color => (
                 <button
                   key={color.name}
                   onClick={() => setSelectedTextColor(color.hex)}
-                  className={`w-6 h-6 rounded-full border-2 ${selectedTextColor === color.hex ? 'border-brand-gold scale-110' : 'border-brand-border'}`}
                   style={{ backgroundColor: color.hex }}
+                  className={`w-7 h-7 rounded-full border-2 transition-transform cursor-pointer ${
+                    selectedTextColor === color.hex ? 'border-brand-gold scale-125 shadow-lg shadow-amber-500/30' : 'border-brand-border hover:scale-110'
+                  }`}
                   title={color.name}
                 />
               ))}
             </div>
           </div>
 
+          {/* Size Selector */}
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl">
-              Garment Color
-            </label>
-            <div className="flex items-center gap-2">
-              {selectedProduct.colors.map(color => (
-                <button
-                  key={color.name}
-                  onClick={() => setSelectedGarmentColor(color)}
-                  className={`w-6 h-6 rounded-full border-2 ${selectedGarmentColor.name === color.name ? 'border-brand-gold scale-110' : 'border-brand-border'}`}
-                  style={{ backgroundColor: color.hex }}
-                  title={color.name}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Control 5: Placement & Size */}
-        <div className="grid grid-cols-2 gap-4 pt-2">
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl flex items-center gap-1.5">
-              <Layout className="w-3.5 h-3.5 text-brand-gold" /> Placement
-            </label>
-            <select
-              value={placement}
-              onChange={(e) => setPlacement(e.target.value as any)}
-              className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-xs text-brand-pearl focus:outline-none focus:border-brand-gold"
-            >
-              <option value="front_center">Front Center</option>
-              <option value="back_center">Back Center</option>
-              <option value="chest_pocket">Left Chest Pocket</option>
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-pearl">
-              Size
-            </label>
-            <div className="flex gap-1.5">
+            <label className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Select Fit Size</label>
+            <div className="flex gap-2">
               {selectedProduct.sizes.map(size => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`flex-1 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                  className={`w-10 h-10 rounded-xl border text-xs font-extrabold transition-all cursor-pointer ${
                     selectedSize === size
                       ? 'border-brand-gold bg-brand-gold text-brand-dark'
-                      : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
+                      : 'border-brand-border bg-brand-dark text-brand-muted hover:text-brand-pearl'
                   }`}
                 >
                   {size}
@@ -367,37 +374,28 @@ export default function CustomizerStudio({ initialProduct }: { initialProduct?: 
               ))}
             </div>
           </div>
-        </div>
 
-        {/* Price & Add to Cart Button */}
-        <div className="pt-4 border-t border-brand-border/80 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-brand-muted">Bespoke Total (Incl. Printing)</p>
-              <p className="text-2xl font-extrabold text-brand-gold">₹{selectedProduct.price.toLocaleString('en-IN')}</p>
-            </div>
-            <div className="text-right text-[11px] text-brand-muted">
-              <p className="flex items-center gap-1 justify-end text-emerald-400 font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5" /> Made-to-Order Quality
-              </p>
-              <p>Dispatched in 3-5 Business Days</p>
-            </div>
-          </div>
-
+          {/* Add Bespoke Item to Bag CTA */}
           <button
             onClick={handleAddToCart}
-            className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-amber-500/20 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
+            className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-sm rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity shadow-xl shadow-amber-500/20 cursor-pointer"
           >
             {added ? (
-              <>
-                <Check className="w-5 h-5 stroke-3" /> Added to Your Story Bag!
-              </>
+              <span className="flex items-center gap-2">
+                <Check className="w-5 h-5" /> Added to Shopping Bag!
+              </span>
             ) : (
-              <>
-                <ShoppingBag className="w-5 h-5" /> Add Bespoke Piece to Bag
-              </>
+              <span className="flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5" /> Add Custom Piece to Bag (₹{selectedProduct.price.toLocaleString('en-IN')})
+              </span>
             )}
           </button>
+
+          <p className="text-[11px] text-center text-brand-muted flex items-center justify-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            240 GSM Organic Cotton • Printed On-Demand via Qikink
+          </p>
+
         </div>
 
       </div>
