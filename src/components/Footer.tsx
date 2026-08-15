@@ -1,149 +1,130 @@
-'use client';
-
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Leaf, Sparkles, Send, CheckCircle2 } from 'lucide-react';
+import { Sparkles, ShieldCheck, Truck, RefreshCw, Mail, ArrowRight, Heart } from 'lucide-react';
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail('');
-    }
-  };
-
   return (
-    <footer className="bg-brand-secondary border-t border-brand-border text-brand-pearl pt-16 pb-12 mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="bg-brand-secondary border-t border-brand-border text-brand-pearl pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        {/* Value Proposition Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12 border-b border-brand-border/60">
-          <div className="flex items-start gap-4 p-6 rounded-2xl bg-brand-card/40 border border-brand-border/40">
-            <div className="p-3 bg-brand-gold/10 text-brand-gold rounded-xl">
-              <Leaf className="w-6 h-6" />
+        {/* Top Grid: Value Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-12 border-b border-brand-border/60">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-base">Zero Inventory & Waste</h4>
-              <p className="text-xs text-brand-muted mt-1 leading-relaxed">
-                Every garment is printed on-demand only when you order. Zero unsold stock ending up in landfills.
-              </p>
+              <h4 className="font-bold text-sm">Zero Inventory</h4>
+              <p className="text-xs text-brand-muted">Printed on-demand with zero waste</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-4 p-6 rounded-2xl bg-brand-card/40 border border-brand-border/40">
-            <div className="p-3 bg-brand-gold/10 text-brand-gold rounded-xl">
-              <Sparkles className="w-6 h-6" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
+              <Truck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-base">Story-Driven Customization</h4>
-              <p className="text-xs text-brand-muted mt-1 leading-relaxed">
-                Print your own quotes, symbols, or artwork on luxury 240 GSM organic combed cotton.
-              </p>
+              <h4 className="font-bold text-sm">Fast Shipping</h4>
+              <p className="text-xs text-brand-muted">3-5 business days across India</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-4 p-6 rounded-2xl bg-brand-card/40 border border-brand-border/40">
-            <div className="p-3 bg-brand-gold/10 text-brand-gold rounded-xl">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
+              <RefreshCw className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-base">Ethical & GST Compliant</h4>
-              <p className="text-xs text-brand-muted mt-1 leading-relaxed">
-                100% secure checkout powered by Razorpay. Includes Indian GST invoice and global dispatch options.
-              </p>
+              <h4 className="font-bold text-sm">30-Day Guarantee</h4>
+              <p className="text-xs text-brand-muted">Free size & quality exchanges</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-gold/10 text-brand-gold flex items-center justify-center border border-brand-gold/30">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm">240 GSM Luxury</h4>
+              <p className="text-xs text-brand-muted">100% Combed organic cotton</p>
             </div>
           </div>
         </div>
 
-        {/* Footer Navigation Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 py-12">
+        {/* Main Footer Links */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           
-          {/* Column 1: Brand Info */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-gold to-amber-200 text-brand-dark flex items-center justify-center font-bold text-lg">
-                K
-              </div>
-              <span className="text-xl font-bold gold-gradient-text">KultZR</span>
-            </div>
-            <p className="text-xs text-brand-muted leading-relaxed">
-              KultZR (“kul-zar”) embodies culture, community, and personal clarity. Wear your identity with pride.
+          {/* Brand Info (4 cols) */}
+          <div className="md:col-span-4 space-y-4">
+            <Link href="/" className="inline-block text-2xl font-black tracking-tight text-brand-pearl">
+              KULT<span className="text-brand-gold">ZR</span>
+            </Link>
+            <p className="text-xs text-brand-muted leading-relaxed max-w-sm">
+              Wear Your Story. Modern, sustainable luxury apparel printed exclusively on-demand. Zero inventory, uncompromised quality.
             </p>
-            <div className="text-[11px] text-brand-muted/70">
-              <p>GSTIN: 27AAAAA0000A1Z5 (Registered)</p>
-              <p>Made with passion in India for the world.</p>
+            <div className="pt-2 text-xs text-brand-gold font-bold">
+              GST Registered • GSTIN: 27AAACK1234F1Z9
             </div>
           </div>
 
-          {/* Column 2: Navigation */}
-          <div className="space-y-3">
-            <h5 className="font-bold text-sm text-brand-pearl tracking-wide uppercase">Explore Collections</h5>
+          {/* Quick Links (3 cols) */}
+          <div className="md:col-span-3 space-y-3">
+            <h4 className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Brand & Studio</h4>
             <ul className="space-y-2 text-xs text-brand-muted">
-              <li><Link href="/shop?category=men" className="hover:text-brand-gold transition-colors">Men&apos;s Streetwear</Link></li>
-              <li><Link href="/shop?category=women" className="hover:text-brand-gold transition-colors">Women&apos;s Apparel</Link></li>
-              <li><Link href="/shop?category=unisex" className="hover:text-brand-gold transition-colors">Unisex Heavyweight Tees</Link></li>
-              <li><Link href="/shop?category=accessories" className="hover:text-brand-gold transition-colors">Canvas Totes & Accessories</Link></li>
-              <li><Link href="/customize" className="text-brand-gold font-semibold hover:underline">Interactive Design Studio</Link></li>
+              <li>
+                <Link href="/about" className="hover:text-brand-pearl transition-colors">About KultZR</Link>
+              </li>
+              <li>
+                <Link href="/story" className="hover:text-brand-pearl transition-colors">Brand Manifesto</Link>
+              </li>
+              <li>
+                <Link href="/customize" className="hover:text-brand-pearl transition-colors">2D Bespoke Studio</Link>
+              </li>
+              <li>
+                <Link href="/shop" className="hover:text-brand-pearl transition-colors">Explore Collections</Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 3: Legal & Support */}
-          <div className="space-y-3">
-            <h5 className="font-bold text-sm text-brand-pearl tracking-wide uppercase">Customer Care</h5>
+          {/* Customer Care & Policies (3 cols) */}
+          <div className="md:col-span-3 space-y-3">
+            <h4 className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Customer Care</h4>
             <ul className="space-y-2 text-xs text-brand-muted">
-              <li><Link href="/story" className="hover:text-brand-gold transition-colors">About KultZR</Link></li>
-              <li><a href="#shipping" className="hover:text-brand-gold transition-colors">Shipping & Delivery Times</a></li>
-              <li><a href="#returns" className="hover:text-brand-gold transition-colors">30-Day Quality Guarantee</a></li>
-              <li><a href="#terms" className="hover:text-brand-gold transition-colors">Terms of Service</a></li>
-              <li><a href="#privacy" className="hover:text-brand-gold transition-colors">Privacy Policy & GDPR</a></li>
+              <li>
+                <Link href="/shipping" className="hover:text-brand-pearl transition-colors">Shipping & Delivery Times</Link>
+              </li>
+              <li>
+                <Link href="/guarantee" className="hover:text-brand-pearl transition-colors">30-Day Quality Guarantee</Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-brand-pearl transition-colors">Terms of Service</Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-brand-pearl transition-colors">Privacy Policy & GDPR</Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 4: Newsletter */}
-          <div className="space-y-4">
-            <h5 className="font-bold text-sm text-brand-pearl tracking-wide uppercase">Join Our Story</h5>
-            <p className="text-xs text-brand-muted">
-              Subscribe to receive exclusive limited drop access and 10% off your first custom piece.
-            </p>
-            {subscribed ? (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                <span>You&apos;re subscribed! Check your inbox for your 10% discount code.</span>
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email address..."
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="flex-1 bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-xs text-brand-pearl focus:outline-none focus:border-brand-gold"
-                />
-                <button
-                  type="submit"
-                  className="p-2.5 bg-brand-gold text-brand-dark rounded-xl hover:bg-amber-400 transition-colors font-bold"
-                  aria-label="Subscribe"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
-            )}
+          {/* Newsletter (2 cols) */}
+          <div className="md:col-span-2 space-y-3">
+            <h4 className="text-xs font-extrabold uppercase tracking-widest text-brand-gold">Stay Updated</h4>
+            <p className="text-[11px] text-brand-muted">Join the story drop circle for secret releases.</p>
+            <Link
+              href="/#newsletter"
+              className="inline-flex items-center gap-1 text-xs font-bold text-brand-gold hover:underline"
+            >
+              Subscribe Newsletter <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
         </div>
 
-        {/* Copyright */}
-        <div className="pt-8 border-t border-brand-border/40 text-center text-xs text-brand-muted flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-brand-border/60 flex flex-col sm:flex-row items-center justify-between text-xs text-brand-muted gap-4">
           <p>© {new Date().getFullYear()} KultZR – Wear Your Story. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <span>Instant Razorpay Checkout</span>
-            <span>Made to Order</span>
-            <span>Zero Plastic Packaging</span>
+          <div className="flex items-center gap-6 text-[11px]">
+            <Link href="/privacy" className="hover:text-brand-pearl transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-brand-pearl transition-colors">Terms</Link>
+            <Link href="/guarantee" className="hover:text-brand-pearl transition-colors">Guarantee</Link>
           </div>
         </div>
 
