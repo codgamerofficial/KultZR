@@ -1,25 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
   <defs>
-    <linearGradient id="goldGradIcon" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F5E080"/>
-      <stop offset="35%" stop-color="#D4AF37"/>
-      <stop offset="70%" stop-color="#AA7C11"/>
-      <stop offset="100%" stop-color="#E5C158"/>
+    <linearGradient id="goldIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7E695"/>
+      <stop offset="40%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA7C11"/>
     </linearGradient>
-    <linearGradient id="silverGradIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="silverIcon" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFFFFF"/>
       <stop offset="50%" stop-color="#C0C0C0"/>
       <stop offset="100%" stop-color="#808080"/>
     </linearGradient>
   </defs>
 
-  <rect width="400" height="400" rx="80" fill="#0A0A0C" stroke="#D4AF37" stroke-width="2" stroke-opacity="0.3"/>
+  <!-- Obsidian Rounded App Card -->
+  <rect width="400" height="400" rx="90" fill="#0A0A0C" stroke="#D4AF37" stroke-width="2" stroke-opacity="0.3"/>
 
-  <g transform="translate(45, 45) scale(0.85)">
-    <!-- Monogram K (Silver) -->
-    <path fill="url(#silverGradIcon)" d="M 110 50 L 155 50 L 155 260 L 110 260 Z M 155 170 L 240 75 L 295 75 L 200 180 L 305 290 L 250 290 L 165 195 Z"/>
-
-    <!-- Monogram ZR Interlaced (Gold) -->
-    <path fill="url(#goldGradIcon)" d="M 140 155 L 280 155 L 310 110 L 245 110 L 330 10 L 300 10 L 205 110 L 140 110 Z M 140 290 L 360 60 L 320 60 L 110 290 Z M 260 155 L 370 290 L 320 290 L 220 170 Z"/>
+  <!-- Centered Arrow Monogram -->
+  <g transform="translate(60, 45) scale(0.9)">
+    <path fill="url(#goldIcon)" d="M 120 70 L 152 70 L 152 280 L 120 280 Z"/>
+    <polygon points="152,180 275,20 240,20 152,130" fill="url(#goldIcon)"/>
+    <polygon points="152,180 280,15 290,45 185,180" fill="url(#silverIcon)"/>
+    <path fill="url(#silverIcon)" d="M 170 155 C 230 155 280 170 280 205 C 280 235 240 255 185 255 L 152 255 L 152 225 L 185 225 C 220 225 245 215 245 205 C 245 190 210 180 170 180 Z"/>
+    <path fill="url(#silverIcon)" d="M 205 215 L 300 290 L 250 290 L 170 225 Z"/>
+    
+    <!-- Star below -->
+    <polygon points="200,320 203,326 210,329 203,332 200,338 197,332 190,329 197,326" fill="url(#goldIcon)"/>
   </g>
 </svg>

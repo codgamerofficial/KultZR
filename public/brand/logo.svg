@@ -1,52 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="100%" height="100%">
   <defs>
     <!-- Metallic Gold Gradient -->
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F5E080"/>
+    <linearGradient id="brandGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7E695"/>
       <stop offset="35%" stop-color="#D4AF37"/>
-      <stop offset="70%" stop-color="#AA7C11"/>
-      <stop offset="100%" stop-color="#E5C158"/>
+      <stop offset="75%" stop-color="#AA7C11"/>
+      <stop offset="100%" stop-color="#E7C86A"/>
     </linearGradient>
 
     <!-- Metallic Silver Gradient -->
-    <linearGradient id="silverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="brandSilverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="40%" stop-color="#C0C0C0"/>
-      <stop offset="80%" stop-color="#808080"/>
-      <stop offset="100%" stop-color="#E0E0E0"/>
+      <stop offset="45%" stop-color="#C0C0C0"/>
+      <stop offset="85%" stop-color="#808080"/>
+      <stop offset="100%" stop-color="#D5D5D5"/>
     </linearGradient>
 
-    <!-- Dark Glow Effect -->
-    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="4" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Glow & Shadow -->
+    <filter id="goldDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#D4AF37" flood-opacity="0.25"/>
     </filter>
   </defs>
 
-  <rect width="800" height="600" fill="#0A0A0C"/>
+  <rect width="800" height="700" fill="#0A0A0C"/>
 
-  <g transform="translate(0, -10)">
-    <!-- Monogram K (Silver) -->
-    <path fill="url(#silverGrad)" d="M 330 110 L 375 110 L 375 320 L 330 320 Z M 375 230 L 460 135 L 515 135 L 420 240 L 525 350 L 470 350 L 385 255 Z"/>
+  <g transform="translate(0, 20)">
+    
+    <!-- MONOGRAM INSIGNIA -->
+    <g filter="url(#goldDropShadow)">
+      <!-- Left Stem of K (Gold) -->
+      <path fill="url(#brandGoldGrad)" d="M 320 130 L 352 130 L 352 340 L 320 340 Z"/>
 
-    <!-- Monogram ZR Interlaced (Gold) -->
-    <path fill="url(#goldGrad)" filter="url(#goldGlow)" d="M 360 215 L 500 215 L 530 170 L 465 170 L 550 70 L 520 70 L 425 170 L 360 170 Z M 360 350 L 580 120 L 540 120 L 330 350 Z M 480 215 L 590 350 L 540 350 L 440 230 Z"/>
+      <!-- Arrow Top-Right Arm of K (Split Gold & Silver) -->
+      <polygon points="352,240 475,80 440,80 352,190" fill="url(#brandGoldGrad)"/>
+      <polygon points="352,240 480,75 490,105 385,240" fill="url(#brandSilverGrad)"/>
 
-    <!-- Typography: KULTZR -->
-    <text x="400" y="440" font-family="'Montserrat', 'Inter', sans-serif" font-size="52" font-weight="900" letter-spacing="18" text-anchor="middle">
-      <tspan fill="url(#silverGrad)">KULT</tspan><tspan fill="url(#goldGrad)">ZR</tspan>
-    </text>
-
-    <!-- Subtitle: WEAR YOUR STORY -->
-    <g transform="translate(400, 485)">
-      <line x1="-240" y1="-5" x2="-140" y2="-5" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.8"/>
-      <text font-family="'Montserrat', 'Inter', sans-serif" font-size="16" font-weight="700" letter-spacing="10" fill="url(#goldGrad)" text-anchor="middle">
-        WEAR YOUR STORY
-      </text>
-      <line x1="140" y1="-5" x2="240" y2="-5" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.8"/>
+      <!-- Loop & Leg of R (Silver) -->
+      <path fill="url(#brandSilverGrad)" d="M 370 215 C 430 215 480 230 480 265 C 480 295 440 315 385 315 L 352 315 L 352 285 L 385 285 C 420 285 445 275 445 265 C 445 250 410 240 370 240 Z"/>
+      <path fill="url(#brandSilverGrad)" d="M 405 275 L 500 350 L 450 350 L 370 285 Z"/>
+      
+      <!-- Registered Mark ® -->
+      <text x="510" y="340" font-family="sans-serif" font-size="14" font-weight="bold" fill="url(#brandSilverGrad)">®</text>
     </g>
 
-    <!-- Diamond Star Accent -->
-    <polygon points="400,515 404,523 412,527 404,531 400,539 396,531 388,527 396,523" fill="url(#goldGrad)"/>
+    <!-- TYPOGRAPHY: K U L T Z R -->
+    <g transform="translate(400, 440)">
+      <text font-family="'Montserrat', 'Inter', sans-serif" font-size="54" font-weight="800" letter-spacing="22" text-anchor="middle">
+        <tspan fill="url(#brandGoldGrad)">KULT</tspan><tspan fill="url(#brandSilverGrad)">ZR</tspan>
+      </text>
+    </g>
+
+    <!-- SLOGAN: — WEAR YOUR STORY — -->
+    <g transform="translate(400, 495)">
+      <line x1="-250" y1="-5" x2="-140" y2="-5" stroke="url(#brandGoldGrad)" stroke-width="1.5" opacity="0.85"/>
+      <text font-family="'Montserrat', 'Inter', sans-serif" font-size="15" font-weight="700" letter-spacing="11" fill="url(#brandSilverGrad)" text-anchor="middle">
+        WEAR YOUR STORY
+      </text>
+      <line x1="140" y1="-5" x2="250" y2="-5" stroke="url(#brandGoldGrad)" stroke-width="1.5" opacity="0.85"/>
+    </g>
+
+    <!-- 4-POINT DIAMOND STAR -->
+    <g transform="translate(400, 540)">
+      <polygon points="0,-16 4,-4 16,0 4,4 0,16 -4,4 -16,0 -4,-4" fill="url(#brandGoldGrad)"/>
+    </g>
+
+    <!-- BRAND TAGLINE NOTE -->
+    <text x="400" y="605" font-family="'Montserrat', sans-serif" font-size="12" font-weight="500" fill="#808080" text-anchor="middle" letter-spacing="1">
+      KULTZR is identity. It&apos;s expression. It&apos;s you.
+    </text>
+
   </g>
 </svg>

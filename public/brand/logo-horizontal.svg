@@ -1,31 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="100%" height="100%">
   <defs>
-    <linearGradient id="goldGradH" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F5E080"/>
+    <linearGradient id="goldH" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7E695"/>
       <stop offset="40%" stop-color="#D4AF37"/>
-      <stop offset="80%" stop-color="#AA7C11"/>
-      <stop offset="100%" stop-color="#E5C158"/>
+      <stop offset="100%" stop-color="#AA7C11"/>
     </linearGradient>
-    <linearGradient id="silverGradH" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="silverH" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFFFFF"/>
       <stop offset="50%" stop-color="#C0C0C0"/>
-      <stop offset="100%" stop-color="#9E9E9E"/>
+      <stop offset="100%" stop-color="#808080"/>
     </linearGradient>
   </defs>
 
-  <g transform="translate(10, 10)">
-    <!-- Monogram Icon (Left) -->
-    <g transform="scale(0.28) translate(20, -10)">
-      <path fill="url(#silverGradH)" d="M 130 50 L 175 50 L 175 260 L 130 260 Z M 175 170 L 260 75 L 315 75 L 220 180 L 325 290 L 270 290 L 185 195 Z"/>
-      <path fill="url(#goldGradH)" d="M 160 155 L 300 155 L 330 110 L 265 110 L 350 10 L 320 10 L 225 110 L 160 110 Z M 160 290 L 380 60 L 340 60 L 130 290 Z M 280 155 L 390 290 L 340 290 L 240 170 Z"/>
+  <g transform="translate(10, 15)">
+    <!-- Monogram Left -->
+    <g transform="scale(0.35) translate(10, -30)">
+      <path fill="url(#goldH)" d="M 120 50 L 152 50 L 152 260 L 120 260 Z"/>
+      <polygon points="152,160 275,0 240,0 152,110" fill="url(#goldH)"/>
+      <polygon points="152,160 280,-5 290,25 185,160" fill="url(#silverH)"/>
+      <path fill="url(#silverH)" d="M 170 135 C 230 135 280 150 280 185 C 280 215 240 235 185 235 L 152 235 L 152 205 L 185 205 C 220 205 245 195 245 185 C 245 170 210 160 170 160 Z"/>
+      <path fill="url(#silverH)" d="M 205 195 L 300 270 L 250 270 L 170 205 Z"/>
     </g>
 
-    <!-- Typography (Right) -->
-    <g transform="translate(130, 52)">
+    <!-- Typography Right -->
+    <g transform="translate(135, 52)">
       <text font-family="'Montserrat', 'Inter', sans-serif" font-size="38" font-weight="900" letter-spacing="6">
-        <tspan fill="url(#silverGradH)">KULT</tspan><tspan fill="url(#goldGradH)">ZR</tspan>
+        <tspan fill="url(#goldH)">KULT</tspan><tspan fill="url(#silverH)">ZR</tspan>
       </text>
-      <text x="2" y="24" font-family="'Montserrat', 'Inter', sans-serif" font-size="10" font-weight="700" letter-spacing="4.5" fill="url(#goldGradH)" opacity="0.9">
+      <text x="2" y="24" font-family="'Montserrat', 'Inter', sans-serif" font-size="10" font-weight="700" letter-spacing="4" fill="url(#goldH)" opacity="0.9">
         WEAR YOUR STORY
       </text>
     </g>
