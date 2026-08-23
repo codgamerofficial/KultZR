@@ -1,1 +1,0 @@
-KultZR implementation notes.
