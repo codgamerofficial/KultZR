@@ -6,81 +6,24 @@ export class QikinkProvider implements FulfillmentProvider {
   code = 'QIKINK';
 
   async getProducts(): Promise<ProviderProduct[]> {
-    try {
-      const response = await qikinkFetch('/products');
-      const rawList = Array.isArray(response) ? response : response?.data || response?.products || [];
-
-      if (!rawList.length) {
-        // Fallback to official catalog products if empty
-        return [
-          {
-            id: '64609138',
-            title: 'Unisex Ringer T-Shirt',
-            description: '240 GSM Premium Organic Cotton Contrast Ringer Tee',
-            category: 'T-Shirts',
-            image_url: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800',
-            images: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800'],
-            base_price: 308.01,
-            variants: [
-              { id: '64609138-S-WHT', sku: 'QIK-64609138-S-WHT', size: 'S', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-              { id: '64609138-M-WHT', sku: 'QIK-64609138-M-WHT', size: 'M', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-              { id: '64609138-L-WHT', sku: 'QIK-64609138-L-WHT', size: 'L', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-              { id: '64609138-XL-WHT', sku: 'QIK-64609138-XL-WHT', size: 'XL', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-            ],
-            raw: { id: '64609138', name: 'Unisex Ringer T-Shirt', price: 308.01 },
-          },
-          {
-            id: '63665902',
-            title: 'GT Unisex Varsity Jacket',
-            description: 'Heavyweight Fleece Satin Lined Streetwear Varsity Jacket',
-            category: 'Jackets',
-            image_url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=800',
-            images: ['https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=800'],
-            base_price: 866.25,
-            variants: [
-              { id: '63665902-M-PUR', sku: 'QIK-63665902-M-PUR', size: 'M', color: 'Purple/White', cost: 866.25, availability: 'IN_STOCK' },
-              { id: '63665902-L-PUR', sku: 'QIK-63665902-L-PUR', size: 'L', color: 'Purple/White', cost: 866.25, availability: 'IN_STOCK' },
-              { id: '63665902-XL-PUR', sku: 'QIK-63665902-XL-PUR', size: 'XL', color: 'Purple/White', cost: 918.75, availability: 'IN_STOCK' },
-            ],
-            raw: { id: '63665902', name: 'GT Unisex Varsity Jacket', price: 866.25 },
-          },
-          {
-            id: '63665896',
-            title: 'DC Unisex Varsity Jacket',
-            description: 'Delhi Capitals Edition Premium Atelier Varsity Jacket',
-            category: 'Jackets',
-            image_url: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=800',
-            images: ['https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=800'],
-            base_price: 866.25,
-            variants: [
-              { id: '63665896-M-BLU', sku: 'QIK-63665896-M-BLU', size: 'M', color: 'Blue/White', cost: 866.25, availability: 'IN_STOCK' },
-              { id: '63665896-L-BLU', sku: 'QIK-63665896-L-BLU', size: 'L', color: 'Blue/White', cost: 866.25, availability: 'IN_STOCK' },
-            ],
-            raw: { id: '63665896', name: 'DC Unisex Varsity Jacket', price: 866.25 },
-          }
-        ];
-      }
-
-      return rawList.map((item: any) => this.mapRawProduct(item));
-    } catch (e) {
-      console.warn('Qikink Open API products fetch failed, using Qikink fallback snapshots:', e);
-      return this.getFallbackProducts();
-    }
+    const response = await qikinkFetch('/products');
+    const rawList = Array.isArray(response) ? response : response?.data || response?.products || [];
+    if (!rawList.length) throw new Error('Qikink returned an empty catalog');
+    return rawList.map((item: any) => this.mapRawProduct(item));
   }
 
   async getProduct(providerProductId: string): Promise<ProviderProduct | null> {
     try {
-      const item = await qikinkFetch(`/products/${providerProductId}`);
-      return this.mapRawProduct(item);
+      const item = await qikinkFetch(`/products/${encodeURIComponent(providerProductId)}`);
+      return item ? this.mapRawProduct(item) : null;
     } catch {
-      const all = await this.getProducts();
-      return all.find(p => p.id === providerProductId) || null;
+      return null;
     }
   }
 
   async getVariants(providerProductId: string): Promise<ProviderVariant[]> {
     const prod = await this.getProduct(providerProductId);
-    return prod ? prod.variants : [];
+    return prod?.variants || [];
   }
 
   async createOrder(payload: ProviderOrderPayload): Promise<ProviderOrderResult> {
@@ -99,104 +42,45 @@ export class QikinkProvider implements FulfillmentProvider {
           state: payload.shipping_address.state,
           zip: payload.shipping_address.pincode,
           country: payload.shipping_address.country || 'India',
-          line_items: payload.items.map(item => ({
-            sku: item.sku,
-            quantity: item.quantity,
-            custom_text: item.custom_text,
-            design_url: item.graphic_url,
-          })),
+          line_items: payload.items.map(item => ({ sku: item.sku, quantity: item.quantity, custom_text: item.custom_text, design_url: item.graphic_url })),
         }),
       });
-
-      return {
-        success: true,
-        provider_order_id: result.order_id || result.id || `QK-${payload.order_number}`,
-        status: 'FULFILLMENT_SUBMITTED',
-        message: 'Order successfully routed to Qikink facility',
-        raw: result,
-      };
+      return { success: true, provider_order_id: String(result.order_id || result.id), status: 'FULFILLMENT_SUBMITTED', message: 'Order routed to Qikink', raw: result };
     } catch (err: any) {
-      console.error('Qikink order creation error:', err.message);
-      return {
-        success: false,
-        status: 'FULFILLMENT_FAILED',
-        message: err.message,
-      };
+      console.error('Qikink order creation error:', err?.message || err);
+      return { success: false, status: 'FULFILLMENT_FAILED', message: err?.message || 'Qikink order creation failed' };
     }
   }
 
   async getTracking(providerOrderId: string): Promise<TrackingData> {
-    try {
-      const data = await qikinkFetch(`/orders/${providerOrderId}/track`);
-      return {
-        provider_order_id: providerOrderId,
-        status: data.status || 'PROCESSING',
-        courier_name: data.courier_name || 'Delhivery',
-        tracking_number: data.tracking_number || 'DLH1982739182',
-        tracking_url: data.tracking_url || `https://delhivery.com/track/${data.tracking_number}`,
-      };
-    } catch {
-      return {
-        provider_order_id: providerOrderId,
-        status: 'PROCESSING',
-        courier_name: 'Delhivery / Bluedart',
-        tracking_number: `QK-TRK-${providerOrderId}`,
-        tracking_url: 'https://qikink.com/track',
-      };
-    }
+    const data = await qikinkFetch(`/orders/${encodeURIComponent(providerOrderId)}/track`);
+    return {
+      provider_order_id: providerOrderId,
+      status: data.status || 'PROCESSING',
+      courier_name: data.courier_name,
+      tracking_number: data.tracking_number,
+      tracking_url: data.tracking_url,
+    };
   }
 
   private mapRawProduct(item: any): ProviderProduct {
     return {
-      id: String(item.id || item.product_id || '64609138'),
-      title: item.name || item.title || 'Unisex Ringer T-Shirt',
-      description: item.description || '240 GSM Heavyweight Organic Cotton Streetwear',
-      category: item.category || 'T-Shirts',
-      image_url: item.image || item.image_url || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800',
-      images: item.images || [item.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800'],
-      base_price: Number(item.price || item.cost || 308.01),
+      id: String(item.id || item.product_id),
+      title: item.name || item.title || 'Untitled Qikink Product',
+      description: item.description || '',
+      category: item.category || 'Uncategorized',
+      image_url: item.image || item.image_url || '',
+      images: Array.isArray(item.images) ? item.images : [item.image || item.image_url].filter(Boolean),
+      base_price: Number(item.price || item.cost || 0),
       variants: (item.variants || []).map((v: any) => ({
-        id: String(v.id || `${item.id}-${v.size}-${v.color}`),
-        sku: v.sku || `QIK-${item.id}-${v.size}`,
-        size: v.size || 'M',
-        color: v.color || 'White',
-        cost: Number(v.price || v.cost || item.price || 308.01),
+        id: String(v.id || `${item.id}-${v.size || 'ALL'}-${v.color || 'ALL'}`),
+        sku: String(v.sku || ''),
+        size: v.size || 'ALL',
+        color: v.color || 'Default',
+        cost: Number(v.price || v.cost || item.price || 0),
         availability: v.in_stock === false ? 'OUT_OF_STOCK' : 'IN_STOCK',
       })),
       raw: item,
     };
-  }
-
-  private getFallbackProducts(): ProviderProduct[] {
-    return [
-      {
-        id: '64609138',
-        title: 'Unisex Ringer T-Shirt',
-        description: '240 GSM Premium Organic Cotton Contrast Ringer Tee',
-        category: 'T-Shirts',
-        image_url: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800',
-        images: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800'],
-        base_price: 308.01,
-        variants: [
-          { id: '64609138-S-WHT', sku: 'QIK-64609138-S-WHT', size: 'S', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-          { id: '64609138-M-WHT', sku: 'QIK-64609138-M-WHT', size: 'M', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-          { id: '64609138-L-WHT', sku: 'QIK-64609138-L-WHT', size: 'L', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-          { id: '64609138-XL-WHT', sku: 'QIK-64609138-XL-WHT', size: 'XL', color: 'White/Black', cost: 308.01, availability: 'IN_STOCK' },
-        ],
-      },
-      {
-        id: '63665902',
-        title: 'GT Unisex Varsity Jacket',
-        description: 'Heavyweight Fleece Satin Lined Streetwear Varsity Jacket',
-        category: 'Jackets',
-        image_url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=800',
-        images: ['https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=800'],
-        base_price: 866.25,
-        variants: [
-          { id: '63665902-M-PUR', sku: 'QIK-63665902-M-PUR', size: 'M', color: 'Purple/White', cost: 866.25, availability: 'IN_STOCK' },
-          { id: '63665902-L-PUR', sku: 'QIK-63665902-L-PUR', size: 'L', color: 'Purple/White', cost: 866.25, availability: 'IN_STOCK' },
-        ],
-      },
-    ];
   }
 }
