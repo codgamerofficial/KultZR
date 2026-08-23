@@ -5,171 +5,109 @@ import Link from 'next/link';
 import { useCart } from '@/lib/cartContext';
 import { useAuth } from '@/lib/authContext';
 import AuthModal from './AuthModal';
-import { ShoppingBag, Search, User, Menu, X, LogOut, Sparkles, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, X, LogOut } from 'lucide-react';
+
+const links = [
+  ['Shop', '/shop'],
+  ['New Drops', '/shop?sort=new'],
+  ['Men', '/shop?category=men'],
+  ['Women / Girls', '/shop?category=women'],
+  ['Unisex', '/shop?category=unisex'],
+  ['Accessories', '/shop?category=accessories'],
+  ['Editorial', '/story'],
+];
 
 export default function Navbar() {
   const { cartCount, setIsCartOpen } = useCart();
   const { user, profile, signOut } = useAuth();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
+  const submitSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!searchQuery.trim()) return;
+    window.location.href = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
+    setSearchOpen(false);
+  };
+
   return (
     <>
-      {/* Top Luxury Announcement Ticker */}
-      <div className="bg-gradient-to-r from-amber-600 via-brand-gold to-amber-500 text-brand-dark overflow-hidden py-1.5 font-mono text-[11px] font-black uppercase tracking-wider shadow-sm">
-        <div className="animate-marquee whitespace-nowrap flex items-center gap-8">
-          <span>⚡ ZERO INVENTORY LUXURY • 240 GSM COMBED ORGANIC COTTON • QIKINK OPEN API REAL-TIME SYNC • FREE EXPRESS DELIVERY ACROSS INDIA • CODE: KULT15 FOR 15% OFF ⚡</span>
-          <span>⚡ ZERO INVENTORY LUXURY • 240 GSM COMBED ORGANIC COTTON • QIKINK OPEN API REAL-TIME SYNC • FREE EXPRESS DELIVERY ACROSS INDIA • CODE: KULT15 FOR 15% OFF ⚡</span>
-        </div>
+      <div className="border-b border-brand-border/70 bg-brand-card px-4 py-2 text-center text-[9px] font-bold uppercase tracking-[0.18em] text-brand-muted">
+        Made on demand · Secure checkout · Trackable orders
       </div>
 
-      {/* Main Floating Glass Navbar */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-2xl bg-brand-dark/85 border-b border-brand-border/60 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          
-          {/* Brand Logo with Monogram vector */}
-          <Link href="/" className="flex items-center gap-3.5 group">
-            <div className="h-11 w-auto relative flex items-center">
-              <img
-                src="/brand/logo-horizontal.svg"
-                alt="KultZR Logo"
-                className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
-              />
-            </div>
-            <span className="hidden lg:inline-flex items-center gap-1 text-[10px] uppercase font-black tracking-widest px-2.5 py-1 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/30">
-              <ShieldCheck className="w-3 h-3 text-brand-gold" /> On-Demand POD
-            </span>
+      <header className="sticky top-0 z-50 border-b border-brand-border/80 bg-brand-dark/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="shrink-0" aria-label="KultZR home">
+            <img src="/brand/logo-horizontal.svg" alt="KultZR" className="h-8 w-auto object-contain sm:h-9" />
           </Link>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-9 text-xs uppercase tracking-widest font-extrabold text-brand-muted">
-            <Link href="/" className="hover:text-brand-gold transition-colors py-1 relative group">
-              Home
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-gold transition-all duration-300 group-hover:w-full" />
-            </Link>
-            <Link href="/shop" className="hover:text-brand-gold transition-colors py-1 relative group text-brand-pearl">
-              Shop Catalog
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-gold transition-all duration-300 group-hover:w-full" />
-            </Link>
-            <Link href="/story" className="hover:text-brand-gold transition-colors py-1 relative group">
-              Brand Story
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-gold transition-all duration-300 group-hover:w-full" />
-            </Link>
-            <Link href="/about" className="hover:text-brand-gold transition-colors py-1 relative group">
-              About
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-gold transition-all duration-300 group-hover:w-full" />
-            </Link>
+          <nav className="hidden items-center gap-5 xl:flex" aria-label="Main navigation">
+            {links.map(([label, href]) => (
+              <Link key={href} href={href} className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.13em] text-brand-muted transition-colors hover:text-brand-pearl">
+                {label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Right Action Icons */}
-          <div className="flex items-center gap-4">
-            
-            {/* Search Trigger */}
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2.5 rounded-full hover:bg-brand-charcoal text-brand-muted hover:text-brand-gold transition-colors cursor-pointer border border-transparent hover:border-brand-border"
-              aria-label="Search Catalog"
-            >
-              <Search className="w-4 h-4 stroke-[2.5]" />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button onClick={() => setSearchOpen(v => !v)} className="rounded-xl p-2.5 text-brand-muted transition-colors hover:bg-white/[0.04] hover:text-brand-pearl" aria-label="Search KultZR">
+              <Search className="h-4 w-4" />
             </button>
 
-            {/* Account / User State */}
             {user ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/account"
-                  className="px-3.5 py-1.5 rounded-full bg-brand-card/90 border border-brand-gold/40 hover:border-brand-gold text-xs font-black text-brand-pearl flex items-center gap-1.5 transition-all shadow-sm"
-                >
-                  <User className="w-3.5 h-3.5 text-brand-gold" />
-                  <span className="max-w-[110px] truncate">{profile?.full_name || 'My Account'}</span>
+              <div className="hidden items-center gap-1 sm:flex">
+                <Link href="/account" className="max-w-[130px] truncate rounded-xl border border-brand-border px-3 py-2 text-[10px] font-bold uppercase tracking-[0.08em] text-brand-pearl hover:border-brand-gold/50">
+                  {profile?.full_name || 'Account'}
                 </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="p-2 text-brand-muted hover:text-red-400 transition-colors cursor-pointer"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
+                <button onClick={() => signOut()} className="rounded-xl p-2.5 text-brand-muted hover:text-red-400" aria-label="Sign out"><LogOut className="h-4 w-4" /></button>
               </div>
             ) : (
-              <button
-                onClick={() => setAuthModalOpen(true)}
-                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-card/60 border border-brand-border hover:border-brand-gold text-xs uppercase font-extrabold text-brand-pearl hover:text-brand-gold transition-all cursor-pointer"
-              >
-                <User className="w-3.5 h-3.5 text-brand-gold" /> Sign In
+              <button onClick={() => setAuthModalOpen(true)} className="hidden items-center gap-1.5 rounded-xl border border-brand-border px-3 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-brand-pearl hover:border-brand-gold/50 sm:flex">
+                <User className="h-3.5 w-3.5 text-brand-gold" /> Sign in
               </button>
             )}
 
-            {/* Cart Bag Icon Trigger */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative p-3 bg-gradient-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark rounded-full shadow-lg shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              aria-label="View Bag"
-            >
-              <ShoppingBag className="w-4 h-4 stroke-[3]" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-brand-dark animate-bounce">
-                  {cartCount}
-                </span>
-              )}
+            <button onClick={() => setIsCartOpen(true)} className="relative rounded-xl bg-brand-gold p-2.5 text-brand-dark transition-transform hover:-translate-y-0.5" aria-label={`Open cart${cartCount ? `, ${cartCount} items` : ''}`}>
+              <ShoppingBag className="h-4 w-4" />
+              {cartCount > 0 && <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-brand-dark bg-white px-1 text-[9px] font-black text-brand-dark">{cartCount}</span>}
             </button>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-brand-muted hover:text-brand-gold transition-colors cursor-pointer"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <button onClick={() => setMobileMenuOpen(v => !v)} className="rounded-xl p-2.5 text-brand-muted hover:text-brand-pearl xl:hidden" aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}>
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
-
           </div>
         </div>
 
-        {/* Expandable Search Input */}
         {searchOpen && (
-          <div className="bg-brand-dark/95 border-b border-brand-border px-4 py-3.5 animate-in slide-in-from-top-2 duration-300">
-            <div className="max-w-3xl mx-auto flex items-center gap-3 bg-brand-card/90 border border-brand-gold/40 rounded-full px-5 py-2.5 shadow-lg">
-              <Search className="w-4 h-4 text-brand-gold shrink-0" />
-              <input
-                type="text"
-                placeholder="Search real Qikink catalog by title, category, or fabric..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && searchQuery) {
-                    window.location.href = `/shop?search=${encodeURIComponent(searchQuery)}`;
-                  }
-                }}
-                className="w-full bg-transparent text-sm text-brand-pearl focus:outline-none placeholder:text-brand-muted font-medium"
-                autoFocus
-              />
-              <button
-                onClick={() => setSearchOpen(false)}
-                className="text-xs font-bold text-brand-muted hover:text-brand-gold uppercase tracking-wider cursor-pointer"
-              >
-                Cancel
-              </button>
+          <form onSubmit={submitSearch} className="border-t border-brand-border/70 bg-brand-dark px-4 py-3">
+            <div className="mx-auto flex max-w-3xl items-center gap-3 rounded-xl border border-brand-border bg-brand-card px-4 py-2.5 focus-within:border-brand-gold/60">
+              <Search className="h-4 w-4 shrink-0 text-brand-gold" />
+              <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} autoFocus placeholder="Search products, categories or collections" aria-label="Search products" className="w-full bg-transparent text-sm text-brand-pearl outline-none placeholder:text-brand-muted" />
+              <button type="button" onClick={() => setSearchOpen(false)} className="text-[10px] font-bold uppercase tracking-[0.1em] text-brand-muted hover:text-brand-pearl">Close</button>
             </div>
-          </div>
+          </form>
         )}
       </header>
 
-      {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-30 bg-brand-dark/95 backdrop-blur-2xl pt-28 px-6 space-y-6 animate-in fade-in duration-300">
-          <nav className="flex flex-col gap-6 text-base font-extrabold uppercase tracking-widest text-brand-pearl border-b border-brand-border pb-8">
-            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold">Home</Link>
-            <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold text-brand-gold">Shop Catalog</Link>
-            <Link href="/story" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold">Brand Story</Link>
-            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="hover:text-brand-gold">About</Link>
+        <div className="fixed inset-0 z-40 bg-brand-dark/98 pt-[88px] backdrop-blur-xl xl:hidden">
+          <nav className="mx-auto max-w-lg px-6 pb-8" aria-label="Mobile navigation">
+            {links.map(([label, href]) => (
+              <Link key={href} href={href} onClick={() => setMobileMenuOpen(false)} className="flex border-b border-brand-border py-4 text-sm font-black uppercase tracking-[0.12em] text-brand-pearl hover:text-brand-gold">
+                {label}
+              </Link>
+            ))}
+            <div className="mt-6 flex gap-3">
+              {user ? <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="flex-1 rounded-xl border border-brand-border px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.1em]">My account</Link> : <button onClick={() => { setMobileMenuOpen(false); setAuthModalOpen(true); }} className="flex-1 rounded-xl border border-brand-border px-4 py-3 text-xs font-bold uppercase tracking-[0.1em]">Sign in</button>}
+              <button onClick={() => { setMobileMenuOpen(false); setIsCartOpen(true); }} className="flex-1 rounded-xl bg-brand-gold px-4 py-3 text-xs font-black uppercase tracking-[0.1em] text-brand-dark">View bag</button>
+            </div>
           </nav>
         </div>
       )}
 
-      {/* Auth Modal */}
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </>
   );
