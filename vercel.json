@@ -7,6 +7,10 @@
     {
       "path": "/api/tracking/refresh",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/fulfillment",
+      "schedule": "*/15 * * * *"
     }
   ],
   "headers": [
