@@ -12,225 +12,108 @@ interface RazorpayModalProps {
   onClose: () => void;
 }
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
+declare global { interface Window { Razorpay: any; } }
 
 export default function RazorpayModal({ amount, customerAddress, onSuccess, onClose }: RazorpayModalProps) {
   const [processing, setProcessing] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<'upi' | 'card' | 'netbanking'>('upi');
   const [sdkLoaded, setSdkLoaded] = useState(false);
+  const [error, setError] = useState('');
 
-  // Dynamically load official Razorpay Checkout SDK script
   useEffect(() => {
+    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existing) { setSdkLoaded(true); return; }
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
     script.onload = () => setSdkLoaded(true);
+    script.onerror = () => setError('Unable to load Razorpay Checkout. Please disable blockers or try again.');
     document.body.appendChild(script);
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    return () => { if (document.body.contains(script)) document.body.removeChild(script); };
   }, []);
 
   const handleOpenLiveRazorpaySDK = async () => {
     setProcessing(true);
-
+    setError('');
     try {
-      // Step 1: Request Order Initialization via Next.js API endpoint
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: amount,
-          currency: 'INR',
-          customerAddress: customerAddress,
-          beneficiaryUpi: 'kultzr@slc',
-        })
+        body: JSON.stringify({ amount, currency: 'INR', customerAddress }),
       });
-
       const orderData = await response.json();
-      const razorpayKey = orderData.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TQ7Cdpi6W4Balz';
+      if (!response.ok || !orderData.success || !orderData.order_id) throw new Error(orderData.error || 'Unable to create Razorpay order');
+      if (!window.Razorpay) throw new Error('Razorpay Checkout is not available in this browser');
 
-      // If official SDK script is loaded, launch standard Razorpay popup window
-      if (window.Razorpay) {
-        const options: any = {
-          key: razorpayKey,
-          amount: Math.round(amount * 100),
-          currency: 'INR',
-          name: 'KultZR – Wear Your Story',
-          description: 'Bespoke On-Demand Apparel Order',
-          image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=200',
-          handler: function (res: any) {
+      const options: any = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency || 'INR',
+        order_id: orderData.order_id,
+        name: 'KultZR',
+        description: 'On-demand fashion order',
+        prefill: { name: customerAddress.full_name, email: customerAddress.email, contact: customerAddress.phone },
+        notes: { merchant: 'KultZR' },
+        theme: { color: '#D4AF37' },
+        handler: async (res: any) => {
+          try {
+            const verify = await fetch('/api/checkout/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: res.razorpay_order_id,
+                razorpay_payment_id: res.razorpay_payment_id,
+                razorpay_signature: res.razorpay_signature,
+              }),
+            });
+            const result = await verify.json();
+            if (!verify.ok || !result.verified) throw new Error(result.error || 'Payment verification failed');
             setProcessing(false);
             confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
-            onSuccess(
-              res.razorpay_payment_id || ('pay_kz_' + Math.random().toString(36).substring(2, 10).toUpperCase()),
-              res.razorpay_order_id || ('order_kz_' + Math.random().toString(36).substring(2, 10).toUpperCase())
-            );
-          },
-          prefill: {
-            name: customerAddress.full_name,
-            email: customerAddress.email,
-            contact: customerAddress.phone,
-            vpa: 'kultzr@slc',
-          },
-          notes: {
-            merchant: 'KultZR – Wear Your Story',
-            beneficiary_upi: 'kultzr@slc',
-          },
-          theme: {
-            color: '#D4AF37',
-          },
-          modal: {
-            ondismiss: function () {
-              setProcessing(false);
-            }
+            onSuccess(res.razorpay_payment_id, res.razorpay_order_id);
+          } catch (err: any) {
+            setProcessing(false);
+            setError(err?.message || 'Payment could not be verified. Please contact support before retrying.');
           }
-        };
+        },
+        modal: { ondismiss: () => setProcessing(false) },
+      };
 
-        // Attach order_id ONLY if a genuine server order was generated by Razorpay
-        if (orderData.is_real && orderData.order_id && !orderData.order_id.startsWith('order_kz_')) {
-          options.order_id = orderData.order_id;
-        }
-
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-      } else {
-        // Fallback simulation if script is blocked by browser extension
-        setTimeout(() => {
-          setProcessing(false);
-          confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
-          const paymentId = 'pay_kz_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-          const fallbackOrderId = 'order_kz_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-          onSuccess(paymentId, fallbackOrderId);
-        }, 1500);
-      }
-    } catch (err) {
-      console.error('Razorpay SDK launch error:', err);
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', (response: any) => {
+        setProcessing(false);
+        setError(response?.error?.description || 'Payment failed. Please try another payment method.');
+      });
+      rzp.open();
+    } catch (err: any) {
       setProcessing(false);
-      const paymentId = 'pay_kz_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-      const fallbackOrderId = 'order_kz_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-      onSuccess(paymentId, fallbackOrderId);
+      setError(err?.message || 'Unable to start payment');
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/85 backdrop-blur-md" onClick={onClose} />
-
-      {/* Modal Card */}
       <div className="relative w-full max-w-lg bg-brand-secondary border border-brand-gold/40 rounded-3xl p-6 sm:p-8 text-brand-pearl shadow-2xl z-10 space-y-6">
-        
-        {/* Gateway Header */}
         <div className="flex items-center justify-between pb-4 border-b border-brand-border">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-extrabold text-sm">
-              RZP
-            </div>
-            <div>
-              <h3 className="font-extrabold text-lg flex items-center gap-1.5">
-                Razorpay Payment Gateway <Lock className="w-4 h-4 text-emerald-400" />
-              </h3>
-              <p className="text-xs text-brand-muted">Beneficiary UPI: <span className="font-mono text-brand-gold font-bold">kultzr@slc</span></p>
-            </div>
-          </div>
-          <button onClick={onClose} className="text-brand-muted hover:text-brand-pearl text-sm font-bold">
-            Cancel
-          </button>
+          <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-extrabold text-sm">RZP</div><div><h3 className="font-extrabold text-lg flex items-center gap-1.5">Razorpay Checkout <Lock className="w-4 h-4 text-emerald-400" /></h3><p className="text-xs text-brand-muted">Secure payment verification enabled</p></div></div>
+          <button onClick={onClose} className="text-brand-muted hover:text-brand-pearl text-sm font-bold">Cancel</button>
         </div>
 
-        {/* Amount Summary */}
-        <div className="p-4 rounded-2xl bg-brand-dark border border-brand-border flex items-center justify-between">
-          <div>
-            <span className="text-xs text-brand-muted">Amount Payable (INR)</span>
-            <p className="text-2xl font-black text-brand-gold">₹{amount.toLocaleString('en-IN')}</p>
-          </div>
-          <div className="text-right text-xs text-brand-muted">
-            <p className="font-semibold text-brand-pearl">{customerAddress.full_name}</p>
-            <p>{customerAddress.email}</p>
-          </div>
-        </div>
+        <div className="p-4 rounded-2xl bg-brand-dark border border-brand-border flex items-center justify-between"><div><span className="text-xs text-brand-muted">Amount Payable (INR)</span><p className="text-2xl font-black text-brand-gold">₹{amount.toLocaleString('en-IN')}</p></div><div className="text-right text-xs text-brand-muted"><p className="font-semibold text-brand-pearl">{customerAddress.full_name}</p><p>{customerAddress.email}</p></div></div>
 
-        {/* Test Mode Explanation Banner */}
-        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 space-y-1">
-          <div className="flex items-center gap-1.5 font-bold text-brand-gold">
-            <Info className="w-4 h-4 shrink-0 text-brand-gold" /> KultZR Beneficiary UPI Target: kultzr@slc
-          </div>
-          <p className="text-[11px] text-amber-200/90 leading-relaxed">
-            Payment routed to official KultZR merchant handle <strong>kultzr@slc</strong>. In Sandbox test mode, click <strong>&quot;UPI&quot;</strong> -&gt; <strong>&quot;Pay Now&quot;</strong> -&gt; <strong>&quot;Success&quot;</strong>.
-          </p>
-        </div>
+        <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300"><div className="flex items-center gap-1.5 font-bold"><Info className="w-4 h-4 shrink-0" /> Real Razorpay order + server-side signature verification</div><p className="text-[11px] mt-1 text-emerald-200/90">KultZR only marks an order paid after the Razorpay signature is verified on the server.</p></div>
 
-        {/* Payment Options Preview */}
-        <div className="space-y-3">
-          <label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Supported Razorpay Payment Modes</label>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => setSelectedMethod('upi')}
-              className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
-                selectedMethod === 'upi'
-                  ? 'border-brand-gold bg-brand-gold/10 text-brand-gold'
-                  : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
-              }`}
-            >
-              <Smartphone className="w-5 h-5" />
-              <span>UPI / QR</span>
-            </button>
+        <div className="space-y-3"><label className="text-xs font-bold uppercase tracking-wider text-brand-muted">Payment Method</label><div className="grid grid-cols-3 gap-2">
+          {([['upi', Smartphone, 'UPI / QR'], ['card', CreditCard, 'Cards'], ['netbanking', Building2, 'NetBanking']] as const).map(([method, Icon, label]) => <button key={method} onClick={() => setSelectedMethod(method)} className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${selectedMethod === method ? 'border-brand-gold bg-brand-gold/10 text-brand-gold' : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'}`}><Icon className="w-5 h-5" /><span>{label}</span></button>)}
+        </div></div>
 
-            <button
-              onClick={() => setSelectedMethod('card')}
-              className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
-                selectedMethod === 'card'
-                  ? 'border-brand-gold bg-brand-gold/10 text-brand-gold'
-                  : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
-              }`}
-            >
-              <CreditCard className="w-5 h-5" />
-              <span>Cards</span>
-            </button>
+        {error && <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-300">{error}</div>}
 
-            <button
-              onClick={() => setSelectedMethod('netbanking')}
-              className={`p-3 rounded-xl border text-xs font-bold flex flex-col items-center gap-1.5 transition-all ${
-                selectedMethod === 'netbanking'
-                  ? 'border-brand-gold bg-brand-gold/10 text-brand-gold'
-                  : 'border-brand-border bg-brand-dark text-brand-muted hover:border-brand-pearl'
-              }`}
-            >
-              <Building2 className="w-5 h-5" />
-              <span>NetBanking</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Launch Razorpay SDK CTA */}
-        <button
-          onClick={handleOpenLiveRazorpaySDK}
-          disabled={processing}
-          className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-50 shadow-xl shadow-amber-500/20 cursor-pointer"
-        >
-          {processing ? (
-            <span className="flex items-center gap-2 animate-pulse">
-              <Lock className="w-4 h-4 animate-spin" /> Launching Razorpay Window...
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <ExternalLink className="w-5 h-5" /> Pay ₹{amount.toLocaleString('en-IN')} to kultzr@slc
-            </span>
-          )}
+        <button onClick={handleOpenLiveRazorpaySDK} disabled={processing || !sdkLoaded} className="w-full py-4 bg-linear-to-r from-amber-400 via-brand-gold to-amber-500 text-brand-dark font-extrabold text-base rounded-2xl flex items-center justify-center gap-2 hover:opacity-95 transition-opacity disabled:opacity-50 shadow-xl shadow-amber-500/20 cursor-pointer">
+          {processing ? <><Lock className="w-4 h-4 animate-spin" /> Processing...</> : <><ExternalLink className="w-5 h-5" /> Pay ₹{amount.toLocaleString('en-IN')}</>}
         </button>
-
-        <div className="flex items-center justify-center gap-2 text-[11px] text-brand-muted">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>256-Bit SSL Encrypted • PCI-DSS Level 1 Compliant</span>
-        </div>
-
+        <div className="flex items-center justify-center gap-2 text-[11px] text-brand-muted"><ShieldCheck className="w-4 h-4 text-emerald-400" />256-bit encrypted checkout</div>
       </div>
     </div>
   );
