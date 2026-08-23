@@ -32,24 +32,25 @@ export interface PODAdapter {
   trackOrder(podOrderId: string): Promise<{ status: string; trackingUrl?: string; courier?: string }>;
 }
 
-/**
- * Production Qikink POD Provider Adapter Implementation
- */
+/** Production Qikink adapter. Never fabricates a successful fulfillment when credentials/API are unavailable. */
 export class QikinkAdapter implements PODAdapter {
   name: 'QIKINK' = 'QIKINK';
 
-  private clientId: string;
-  private clientSecret: string;
-  private baseUrl: string;
-
-  constructor() {
-    this.clientId = process.env.QIKINK_CLIENT_ID || '787412766423348';
-    this.clientSecret = process.env.QIKINK_CLIENT_SECRET || '';
-    this.baseUrl = process.env.QIKINK_API_URL || 'https://api.qikink.com/v2';
-  }
+  private clientId = process.env.QIKINK_CLIENT_ID || '';
+  private clientSecret = process.env.QIKINK_CLIENT_SECRET || '';
+  private baseUrl = process.env.QIKINK_API_BASE_URL || process.env.QIKINK_API_URL || 'https://api.qikink.com/v2';
 
   async createOrder(payload: PODFulfillmentPayload): Promise<PODFulfillmentResponse> {
-    console.log(`[QikinkAdapter] Dispatching order ${payload.orderId} to Qikink Live API with Client ID: ${this.clientId}`);
+    if (!this.clientId || !this.clientSecret) {
+      return {
+        success: false,
+        provider: 'QIKINK',
+        podOrderId: '',
+        status: 'FULFILLMENT_NOT_CONFIGURED',
+        estimatedDispatchDays: 0,
+        rawResponse: { error: 'Qikink server credentials are not configured' },
+      };
+    }
 
     const qikinkPayload = {
       order_number: payload.orderId,
@@ -66,96 +67,91 @@ export class QikinkAdapter implements PODAdapter {
         email: payload.customerAddress.email,
       },
       line_items: payload.items.map((item) => ({
-        search_sku: item.qikinkSku || `KZ-240GSM-${item.color.toUpperCase()}-${item.size.toUpperCase()}`,
+        search_sku: item.qikinkSku,
         quantity: item.quantity,
-        print_design_url: item.customizationUrl || 'https://kultzr.com/brand/logo.png',
+        print_design_url: item.customizationUrl,
         print_text: item.designText || '',
         print_position: 'chest',
       })),
       is_cod: payload.isCod || false,
     };
 
-    try {
-      if (this.clientId && this.clientSecret) {
-        const res = await fetch(`${this.baseUrl}/orders/create`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Qikink-Client-Id': this.clientId,
-            'X-Qikink-Client-Secret': this.clientSecret,
-          },
-          body: JSON.stringify(qikinkPayload),
-        });
+    if (qikinkPayload.line_items.some((item) => !item.search_sku)) {
+      return {
+        success: false,
+        provider: 'QIKINK',
+        podOrderId: '',
+        status: 'FULFILLMENT_SKU_MISSING',
+        estimatedDispatchDays: 0,
+        rawResponse: { error: 'Every paid order item must have a Qikink SKU' },
+      };
+    }
 
-        if (res.ok) {
-          const data = await res.json();
-          return {
-            success: true,
-            provider: 'QIKINK',
-            podOrderId: data.order_id || `QK-${Date.now()}`,
-            status: 'Processing in Qikink Production Facility',
-            estimatedDispatchDays: 3,
-            rawResponse: data,
-          };
-        }
+    try {
+      const res = await fetch(`${this.baseUrl}/orders/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Qikink-Client-Id': this.clientId,
+          'X-Qikink-Client-Secret': this.clientSecret,
+        },
+        body: JSON.stringify(qikinkPayload),
+        cache: 'no-store',
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return {
+          success: false,
+          provider: 'QIKINK',
+          podOrderId: '',
+          status: 'FULFILLMENT_FAILED',
+          estimatedDispatchDays: 0,
+          rawResponse: data,
+        };
       }
 
-      // Live fallback order creation receipt
-      const simulatedPodId = `QK-PROD-${Math.floor(100000 + Math.random() * 900000)}`;
       return {
         success: true,
         provider: 'QIKINK',
-        podOrderId: simulatedPodId,
-        status: 'Sent to Qikink Atelier Print Queue',
+        podOrderId: String(data.order_id || data.id || ''),
+        status: 'FULFILLMENT_SUBMITTED',
         estimatedDispatchDays: 3,
-        rawResponse: { message: 'Order sent to Qikink production queue', clientId: this.clientId },
+        rawResponse: data,
       };
-    } catch (err) {
-      console.error('[QikinkAdapter] Network Error:', err);
+    } catch (err: any) {
+      console.error('[QikinkAdapter] Network error:', err);
       return {
-        success: true,
+        success: false,
         provider: 'QIKINK',
-        podOrderId: `QK-BATCH-${Date.now()}`,
-        status: 'Queued for Qikink Dispatch',
-        estimatedDispatchDays: 4,
+        podOrderId: '',
+        status: 'FULFILLMENT_NETWORK_ERROR',
+        estimatedDispatchDays: 0,
+        rawResponse: { error: err?.message || 'Network error' },
       };
     }
   }
 
   async trackOrder(podOrderId: string) {
     return {
-      status: 'Printing on 240 GSM Fabric',
-      courier: 'Delhivery Express',
-      trackingUrl: `https://track.qikink.com/parcel/${podOrderId}`,
+      status: 'PROCESSING',
+      courier: undefined,
+      trackingUrl: undefined,
     };
   }
 }
 
 export class PrintfulAdapter implements PODAdapter {
   name: 'PRINTFUL' = 'PRINTFUL';
-
   async createOrder(payload: PODFulfillmentPayload): Promise<PODFulfillmentResponse> {
-    return {
-      success: true,
-      provider: 'PRINTFUL',
-      podOrderId: `PF-GLOBAL-${Date.now()}`,
-      status: 'Created in Printful Hub',
-      estimatedDispatchDays: 4,
-    };
+    return { success: false, provider: 'PRINTFUL', podOrderId: '', status: 'NOT_CONFIGURED', estimatedDispatchDays: 0 };
   }
-
-  async trackOrder(podOrderId: string) {
-    return {
-      status: 'In Transit via DHL Express',
-      courier: 'DHL',
-      trackingUrl: `https://www.dhl.com/en/express/tracking.html?AWB=${podOrderId}`,
-    };
+  async trackOrder() {
+    return { status: 'NOT_CONFIGURED' };
   }
 }
 
 export function getPODAdapter(countryCode: string = 'IN'): PODAdapter {
-  if (countryCode === 'IN') {
-    return new QikinkAdapter();
-  }
+  if (countryCode === 'IN') return new QikinkAdapter();
   return new PrintfulAdapter();
 }
