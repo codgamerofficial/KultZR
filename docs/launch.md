@@ -1,1 +1,0 @@
-KultZR launch notes
