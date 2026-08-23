@@ -11,38 +11,32 @@ interface ProductCardProps {
   product: Product;
 }
 
-function parseColors(value: Product['colors']): ColorOption[] {
-  if (Array.isArray(value) && value.length) return value;
-  if (typeof value === 'string') {
-    try {
-      const parsed = JSON.parse(value);
-      if (Array.isArray(parsed) && parsed.length) return parsed;
-    } catch {
-      // Fall through to a neutral color.
-    }
+function parseJsonArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (typeof value !== 'string' || !value.trim()) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed as T[] : [];
+  } catch {
+    return [];
   }
-  return [{ name: 'Default', hex: '#111111' }];
 }
 
-function parseSizes(value: Product['sizes']): string[] {
-  if (Array.isArray(value) && value.length) return value;
-  if (typeof value === 'string') {
-    return value.split(',').map(size => size.trim()).filter(Boolean);
-  }
+function parseColors(value: unknown): ColorOption[] {
+  const parsed = parseJsonArray<ColorOption>(value);
+  return parsed.length ? parsed : [{ name: 'Default', hex: '#111111' }];
+}
+
+function parseSizes(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  if (typeof value === 'string') return value.split(',').map(size => size.trim()).filter(Boolean);
   return [];
 }
 
-function parseImages(product: Product): string[] {
-  if (Array.isArray(product.images) && product.images.length) return product.images.filter(Boolean);
-  if (typeof product.images === 'string') {
-    try {
-      const parsed = JSON.parse(product.images);
-      if (Array.isArray(parsed) && parsed.length) return parsed.filter(Boolean);
-    } catch {
-      if (product.images.trim()) return [product.images.trim()];
-    }
-  }
-  return [];
+function parseImages(value: unknown): string[] {
+  const parsed = parseJsonArray<string>(value).filter(Boolean);
+  if (parsed.length) return parsed;
+  return typeof value === 'string' && value.trim() ? [value.trim()] : [];
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -53,7 +47,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const colors = useMemo(() => parseColors(product.colors), [product.colors]);
   const sizes = useMemo(() => parseSizes(product.sizes), [product.sizes]);
-  const images = useMemo(() => parseImages(product), [product.images]);
+  const images = useMemo(() => parseImages(product.images), [product.images]);
   const activeColor = selectedColor || colors[0];
   const discountPercent = product.original_price && product.original_price > product.price
     ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
