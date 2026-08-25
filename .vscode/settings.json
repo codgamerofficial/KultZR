@@ -1,0 +1,7 @@
+{
+  "css.lint.unknownAtRules": "ignore",
+  "json.schemaDownload.enable": false,
+  "files.associations": {
+    "*.sql": "sql"
+  }
+}
